@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import TopMenu from "../topMenu";
 
 const NavigationMenu = () => {
   const pathname = usePathname();
@@ -29,7 +28,6 @@ const NavigationMenu = () => {
           </li>
         </ul>
       </div>
-      <TopMenu />
     </nav>
   );
 };
