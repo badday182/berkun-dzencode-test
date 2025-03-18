@@ -1,5 +1,4 @@
-// Format date: "DD / MMM / YYYY"
-const formatDate = (dateString: string) => {
+export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   const day = date.getDate().toString().padStart(2, "0");
   const month = date.toLocaleString("default", { month: "short" });
@@ -7,4 +6,9 @@ const formatDate = (dateString: string) => {
   return `${day} / ${month} / ${year}`;
 };
 
-export default formatDate;
+export const formatDateShort = (dateString: string) => {
+  const date = new Date(dateString);
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear().toString().slice(-2);
+  return `${month} / ${year}`;
+};

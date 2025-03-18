@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import OrderCard from "@public/components/orderCard";
-import formatDate from "@public/utils/formatDate";
+import { formatDate, formatDateShort } from "@public/utils/formatDate";
 import getOrderStats from "@public/utils/getOrderStats";
 import { Order, Product } from "@public/types";
 
@@ -20,7 +20,7 @@ const Orders = () => {
         const ordersData = [
           {
             id: 1,
-            title: "Order 1",
+            title: "Order 1 Длинное продлинное длиннючос название прихода",
             date: "2017-06-29 12:09:33",
             description: "desc",
           },
@@ -240,6 +240,7 @@ const Orders = () => {
             title={order.title}
             productsCount={productsCount}
             date={formatDate(order.date)}
+            dateShort={formatDateShort(order.date)}
             priceUSD={priceUSD}
             priceUAH={priceUAH}
           />
