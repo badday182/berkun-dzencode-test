@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import OrderCard from "../../../public/components/orderCard";
+import OrderCard from "@public/components/orderCard";
+import formatDate from "@public/utils/formatDate";
+import getOrderStats from "@public/utils/getOrderStats";
 
 const Orders = () => {
   const [orders, setOrders] = useState<
@@ -249,46 +251,17 @@ const Orders = () => {
     fetchData();
   }, []);
 
-  // Format date: "DD / MMM / YYYY"
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = date.toLocaleString("default", { month: "short" });
-    const year = date.getFullYear();
-    return `${day} / ${month} / ${year}`;
-  };
-
-  // Calculate order statistics for each order
-  const getOrderStats = (orderId: number) => {
-    const orderProducts = products.filter(
-      (product) => product.order === orderId
-    );
-
-    const totalPrices = orderProducts.reduce(
-      (acc, product) => {
-        product.price.forEach((price) => {
-          if (price.symbol === "USD") acc.USD += price.value;
-          if (price.symbol === "UAH") acc.UAH += price.value;
-        });
-        return acc;
-      },
-      { USD: 0, UAH: 0 }
-    );
-
-    return {
-      productsCount: orderProducts.length,
-      priceUSD: totalPrices.USD,
-      priceUAH: totalPrices.UAH,
-    };
-  };
-
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className="container">
       <h1 className="mb-4">Orders</h1>
       {orders.map((order) => {
-        const { productsCount, priceUSD, priceUAH } = getOrderStats(order.id);
+        // const { productsCount, priceUSD, priceUAH } = getOrderStats(order.id);
+        const { productsCount, priceUSD, priceUAH } = getOrderStats(
+          order.id,
+          products
+        );
 
         return (
           <OrderCard
