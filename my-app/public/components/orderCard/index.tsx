@@ -25,11 +25,11 @@ const OrderCard: React.FC<OrderCardProps> = ({
             className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5 ${styles.cardContent}`}
           >
             <h5 className="card-title flex-grow-1 m-0">{title}</h5>
-            <div>
+            <div className="flex-shrink-0">
               <span className="fw-semibold">{productsCount}</span>
               <span className="text-muted">{` Продукта`}</span>
             </div>
-            <div className="d-flex flex-column align-items-center">
+            <div className="d-flex flex-column align-items-center flex-shrink-0">
               <div className="text-muted">{dateShort}</div>
               <div className="text-muted fs-5">{date}</div>
             </div>
