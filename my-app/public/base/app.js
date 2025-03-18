@@ -1,4 +1,4 @@
-const orders = [
+export const ordersData = [
   {
     id: 1,
     title: "Order 1",
@@ -28,7 +28,7 @@ const orders = [
   },
 ];
 
-const products = [
+export const productsData = [
   {
     id: 1,
     serialNumber: 1234,
