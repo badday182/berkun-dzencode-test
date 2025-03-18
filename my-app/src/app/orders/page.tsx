@@ -6,6 +6,11 @@ import { formatDate, formatDateShort } from "@public/utils/formatDate";
 import getOrderStats from "@public/utils/getOrderStats";
 import { Order, Product } from "@public/types";
 import { ordersData, productsData } from "@public/base/app";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import {
+  toggleAsideContainer,
+  setSelectedOrderId,
+} from "@/lib/features/orders/ordersSlice";
 
 import styles from "./index.module.css";
 
@@ -14,8 +19,11 @@ const Orders = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [isOpenAsideContainer, setIsOpenAsideContainer] =
-    useState<boolean>(false);
+  // Use Redux state instead of local state
+  const dispatch = useAppDispatch();
+  const isOpenAsideContainer = useAppSelector(
+    (state) => state.orders.isOpenAsideContainer
+  );
 
   useEffect(() => {
     // In a real application need fetch data
@@ -57,7 +65,11 @@ const Orders = () => {
               return (
                 <div
                   className="container mb-3"
-                  onClick={() => setIsOpenAsideContainer(true)}
+                  key={order.id}
+                  onClick={() => {
+                    dispatch(toggleAsideContainer(true));
+                    // dispatch(setSelectedOrderId(order.id));
+                  }}
                 >
                   <OrderCard
                     key={order.id}
@@ -77,7 +89,16 @@ const Orders = () => {
           className={`${isOpenAsideContainer ? "w-50" : "d-none"} ${
             styles.asideContainer
           }`}
-        ></div>
+        >
+          {/* You can add a close button here */}
+          <button
+            className="btn btn-sm btn-light"
+            onClick={() => dispatch(toggleAsideContainer(false))}
+          >
+            Close
+          </button>
+          {/* Content of the aside container */}
+        </div>
       </div>
     </div>
   );
