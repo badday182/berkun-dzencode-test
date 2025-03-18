@@ -1,7 +1,7 @@
 export const ordersData = [
   {
     id: 1,
-    title: "Order 1",
+    title: "Order 1 Длинное предлинное длиннючее длиннючее название прихода",
     date: "2017-06-29 12:09:33",
     description: "desc",
     get products() {

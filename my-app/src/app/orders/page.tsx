@@ -47,15 +47,17 @@ const Orders = () => {
           products
         );
         return (
-          <OrderCard
-            key={order.id}
-            title={order.title}
-            productsCount={productsCount}
-            date={formatDate(order.date)}
-            dateShort={formatDateShort(order.date)}
-            priceUSD={priceUSD}
-            priceUAH={priceUAH}
-          />
+          <div className="container mt-3">
+            <OrderCard
+              key={order.id}
+              title={order.title}
+              productsCount={productsCount}
+              date={formatDate(order.date)}
+              dateShort={formatDateShort(order.date)}
+              priceUSD={priceUSD}
+              priceUAH={priceUAH}
+            />
+          </div>
         );
       })}
     </div>
