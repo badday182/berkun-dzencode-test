@@ -1,4 +1,6 @@
-const getOrderStats = (orderId: number, products) => {
+import { Product } from "@public/types";
+
+const getOrderStats = (orderId: number, products: Product[]) => {
   const orderProducts = products.filter((product) => product.order === orderId);
 
   const totalPrices = orderProducts.reduce(

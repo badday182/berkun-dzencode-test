@@ -4,38 +4,11 @@ import { useEffect, useState } from "react";
 import OrderCard from "@public/components/orderCard";
 import formatDate from "@public/utils/formatDate";
 import getOrderStats from "@public/utils/getOrderStats";
+import { Order, Product } from "@public/types";
 
 const Orders = () => {
-  const [orders, setOrders] = useState<
-    {
-      id: number;
-      title: string;
-      date: string;
-      description: string;
-    }[]
-  >([]);
-  const [products, setProducts] = useState<
-    {
-      id: number;
-      serialNumber: number;
-      isNew: number;
-      photo: string;
-      title: string;
-      type: string;
-      specification: string;
-      guarantee: {
-        start: string;
-        end: string;
-      };
-      price: {
-        value: number;
-        symbol: string;
-        isDefault: number;
-      }[];
-      order: number;
-      date: string;
-    }[]
-  >([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -257,12 +230,10 @@ const Orders = () => {
     <div className="container">
       <h1 className="mb-4">Orders</h1>
       {orders.map((order) => {
-        // const { productsCount, priceUSD, priceUAH } = getOrderStats(order.id);
         const { productsCount, priceUSD, priceUAH } = getOrderStats(
           order.id,
           products
         );
-
         return (
           <OrderCard
             key={order.id}
