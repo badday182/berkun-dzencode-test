@@ -4,13 +4,15 @@ import { useEffect, useState } from "react";
 import OrderCard from "../../../public/components/orderCard";
 
 const Orders = () => {
-  const [orderData, setOrderData] = useState<{
-    id: number;
-    title: string;
-    date: string;
-    description: string;
-  } | null>(null);
-  const [orderProducts, setOrderProducts] = useState<
+  const [orders, setOrders] = useState<
+    {
+      id: number;
+      title: string;
+      date: string;
+      description: string;
+    }[]
+  >([]);
+  const [products, setProducts] = useState<
     {
       id: number;
       serialNumber: number;
@@ -32,7 +34,7 @@ const Orders = () => {
       date: string;
     }[]
   >([]);
-  const [totalPrices, setTotalPrices] = useState({ USD: 0, UAH: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // In a real application, you would import or fetch this data
@@ -40,37 +42,28 @@ const Orders = () => {
     const fetchData = async () => {
       try {
         // Simulating fetching the data from app.js
-        const orders = [
+        const ordersData = [
           {
             id: 1,
             title: "Order 1",
             date: "2017-06-29 12:09:33",
             description: "desc",
-            get products() {
-              return products;
-            },
           },
           {
             id: 2,
             title: "Order 2",
             date: "2018-05-21 12:09:33",
             description: "desc",
-            get products() {
-              return products;
-            },
           },
           {
             id: 3,
             title: "Order 3",
             date: "2019-04-10 12:09:33",
             description: "desc",
-            get products() {
-              return products;
-            },
           },
         ];
 
-        const products = [
+        const productsData = [
           {
             id: 1,
             serialNumber: 1234,
@@ -244,37 +237,17 @@ const Orders = () => {
           },
         ];
 
-        // Get the order with id: 1
-        const targetOrder = orders.find((order) => order.id === 1);
-
-        // Get products for this order (where order: 1)
-        const orderProducts = products.filter((product) => product.order === 1);
-
-        // Calculate total prices
-        const totalPrices = orderProducts.reduce(
-          (acc, product) => {
-            product.price.forEach((price) => {
-              if (price.symbol === "USD") acc.USD += price.value;
-              if (price.symbol === "UAH") acc.UAH += price.value;
-            });
-            return acc;
-          },
-          { USD: 0, UAH: 0 }
-        );
-
-        setOrderData(targetOrder || null);
-        setOrderProducts(orderProducts);
-        setTotalPrices(totalPrices);
+        setOrders(ordersData);
+        setProducts(productsData);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
-
-  // If data is not loaded yet
-  if (!orderData) return <div>Loading...</div>;
 
   // Format date: "DD / MMM / YYYY"
   const formatDate = (dateString: string) => {
@@ -285,16 +258,49 @@ const Orders = () => {
     return `${day} / ${month} / ${year}`;
   };
 
+  // Calculate order statistics for each order
+  const getOrderStats = (orderId: number) => {
+    const orderProducts = products.filter(
+      (product) => product.order === orderId
+    );
+
+    const totalPrices = orderProducts.reduce(
+      (acc, product) => {
+        product.price.forEach((price) => {
+          if (price.symbol === "USD") acc.USD += price.value;
+          if (price.symbol === "UAH") acc.UAH += price.value;
+        });
+        return acc;
+      },
+      { USD: 0, UAH: 0 }
+    );
+
+    return {
+      productsCount: orderProducts.length,
+      priceUSD: totalPrices.USD,
+      priceUAH: totalPrices.UAH,
+    };
+  };
+
+  if (loading) return <div>Loading...</div>;
+
   return (
     <div className="container">
       <h1 className="mb-4">Orders</h1>
-      <OrderCard
-        title={orderData.title}
-        productsCount={orderProducts.length}
-        date={formatDate(orderData.date)}
-        priceUSD={totalPrices.USD}
-        priceUAH={totalPrices.UAH}
-      />
+      {orders.map((order) => {
+        const { productsCount, priceUSD, priceUAH } = getOrderStats(order.id);
+
+        return (
+          <OrderCard
+            key={order.id}
+            title={order.title}
+            productsCount={productsCount}
+            date={formatDate(order.date)}
+            priceUSD={priceUSD}
+            priceUAH={priceUAH}
+          />
+        );
+      })}
     </div>
   );
 };
