@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import OrderCard from "@public/components/orderCard";
-import { formatDate, formatDateShort } from "@public/utils/formatDate";
-import getOrderStats from "@public/utils/getOrderStats";
-import { Order, Product } from "@public/types";
-import { ordersData, productsData } from "@public/base/app";
+import OrderCard from "@/components/orderCard";
+import { formatDate, formatDateShort } from "@/utils/formatDate";
+import getOrderStats from "@/utils/getOrderStats";
+import { Order, Product } from "@/types";
+import { ordersData, productsData } from "@/base/app";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   toggleAsideContainer,

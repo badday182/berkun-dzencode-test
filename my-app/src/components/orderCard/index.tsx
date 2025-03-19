@@ -1,3 +1,5 @@
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+
 import styles from "./index.module.css";
 
 interface OrderCardProps {
@@ -17,6 +19,9 @@ const OrderCard: React.FC<OrderCardProps> = ({
   priceUSD,
   priceUAH,
 }) => {
+  const isOpenAsideContainer = useAppSelector(
+    (state) => state.orders.isOpenAsideContainer
+  );
   return (
     <div className={`card shadow-sm ${styles.card}`}>
       <div className="card-body">

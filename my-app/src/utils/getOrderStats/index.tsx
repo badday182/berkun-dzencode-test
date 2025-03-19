@@ -1,4 +1,4 @@
-import { Product } from "@public/types";
+import { Product } from "@/types";
 
 const getOrderStats = (orderId: number, products: Product[]) => {
   const orderProducts = products.filter((product) => product.order === orderId);

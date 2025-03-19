@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import NavigationMenu from "@public/components/navigationMenu";
+import NavigationMenu from "@/components/navigationMenu";
 import StoreProvider from "./StoreProvider";
 
 import "bootstrap/dist/css/bootstrap.min.css";
