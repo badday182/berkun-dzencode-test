@@ -7,6 +7,10 @@ import {
   deleteOrder,
   deleteProduct,
 } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
+import {
+  setSelectedOrderId,
+  toggleAsideContainer,
+} from "@/lib/features/orders/ordersSlice";
 interface ModalWindowProps {
   isOpen: boolean;
   onClose: () => void;
@@ -50,6 +54,8 @@ const ModalWindow: React.FC<ModalWindowProps> = ({
   const handleDelete = () => {
     if (category === "order") {
       dispatch(deleteOrder(String(id)));
+      dispatch(toggleAsideContainer(false));
+      dispatch(setSelectedOrderId(null));
     }
     if (category === "product") {
       dispatch(deleteProduct(id));
