@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import clsx from "clsx";
 
 import styles from "./index.module.css";
+import ProductCard from "../productsCard";
 
 const OrderProductsCard: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +27,7 @@ const OrderProductsCard: React.FC = () => {
             dispatch(setSelectedOrderId(null));
           }}
         ></i>
+        <ProductCard />
       </div>
     </div>
   );

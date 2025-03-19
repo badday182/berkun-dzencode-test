@@ -1,7 +1,7 @@
 import { ProductCardProps } from "@/types";
 import styles from "./index.module.css";
 
-const ProductsCard: React.FC<ProductCardProps> = ({
+const ProductCard: React.FC<ProductCardProps> = ({
   title = "Unknown Product",
   productType = "Unknown Type",
   guaranteeStartDate = "Unknown Date",
@@ -26,9 +26,14 @@ const ProductsCard: React.FC<ProductCardProps> = ({
             </div>
 
             <div className="d-flex flex-column align-items-center flex-shrink-0">
-              <div className="text-muted">Гарантия до:</div>
-              <div className="text-muted">{guaranteeEndDate}</div>
-              <div className="text-muted fs-6">({guaranteeStartDate})</div>
+              <div>
+                <span className="text-muted">с: </span>
+                <span className="text-muted">{guaranteeStartDate}</span>
+              </div>
+              <div>
+                <span className="text-muted">по: </span>
+                <span className="text-muted fs-6">{guaranteeEndDate}</span>
+              </div>
             </div>
 
             <div className="d-flex flex-column flex-shrink-0">
@@ -51,4 +56,4 @@ const ProductsCard: React.FC<ProductCardProps> = ({
   );
 };
 
-export default ProductsCard;
+export default ProductCard;
