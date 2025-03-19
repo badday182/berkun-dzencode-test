@@ -8,7 +8,6 @@ import {
 } from "@/lib/features/orders/ordersSlice";
 import { formatDate, formatDateShort } from "@/utils/formatDate";
 import getOrderStats from "@/utils/getOrderStats";
-import { Order, Product } from "@/types";
 import { ordersData, productsData } from "@/base/app";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import OrderCard from "@/components/orderCard";
@@ -40,8 +39,8 @@ const Orders = () => {
       try {
         // Simulating fetching the data
 
-        dispatch(setOrders(ordersData));
-        dispatch(setProducts(productsData));
+        !!orders ? dispatch(setOrders(ordersData)) : null;
+        !!products ? dispatch(setProducts(productsData)) : null;
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);

@@ -1,6 +1,10 @@
+"use client";
+
 import { Product } from "@/types";
 import styles from "./index.module.css";
-
+import { useAppSelector } from "@/lib/hooks";
+import clsx from "clsx";
+import { usePathname } from "next/navigation";
 const defaultProduct: Product = {
   id: 0,
   serialNumber: 7777777777,
@@ -34,8 +38,18 @@ const ProductCard: React.FC<{ product?: Product }> = ({
     product.guarantee.start
   ).toLocaleDateString();
   const guaranteeEndDate = new Date(product.guarantee.end).toLocaleDateString();
-  const receiptDate = new Date(product.date).toLocaleDateString();
+  // const receiptDate = new Date(product.date).toLocaleDateString();
 
+  const orders = useAppSelector((state) => state.ordersAndProductsData.orders);
+
+  const orderTitle =
+    orders.find((order) => order.id === product.order)?.title ||
+    "Default Order";
+
+  const isOpenAsideContainer = useAppSelector(
+    (state) => state.orders.isOpenAsideContainer
+  );
+  const pathname = usePathname();
   return (
     <div className={`card shadow-sm flex-grow-1 ${styles.card}`}>
       <div className="card-body">
@@ -46,7 +60,7 @@ const ProductCard: React.FC<{ product?: Product }> = ({
             <div className="d-flex justify-content-between align-items-center gap-3 flex-grow-1">
               <h5 className="card-title flex-grow-1 m-0">{product.title}</h5>
               <span
-                className={`badge bg-secondary flex-shrink-0 ${styles.type}`}
+                className={`badge bg-secondary flex-shrink-0 ${styles.wordWrap}`}
               >
                 {product.type}
               </span>
@@ -72,9 +86,17 @@ const ProductCard: React.FC<{ product?: Product }> = ({
               </div>
             </div>
 
-            <div className="d-flex flex-column flex-shrink-0">
-              <div className="text-muted">Приход:</div>
-              <div className="fw-semibold">{receiptDate}</div>
+            <div
+              className={clsx(
+                "text-muted d-flex flex-column flex-shrink-0",
+                styles.wordWrap,
+                styles.smallFontSize,
+                {
+                  "d-none": isOpenAsideContainer && pathname === "/orders",
+                }
+              )}
+            >
+              {orderTitle}
             </div>
           </div>
 

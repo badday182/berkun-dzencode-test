@@ -2,11 +2,15 @@
   transition: box-shadow 0.3s ease;
 }
 
-.type {
+.wordWrap {
   max-width: 125px;
   white-space: pre-wrap; /* Учитывает пробелы и переносы строк */
   word-wrap: break-word; /* Перенос длинных слов */
   /* word-break: break-all;  */
+}
+
+.smallFontSize {
+  font-size: 12px;
 }
 
 .card:hover {
