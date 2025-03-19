@@ -14,13 +14,13 @@ import OrderCard from "@/components/orderCard";
 import clsx from "clsx";
 
 import styles from "./index.module.css";
+import OrderProductsCard from "@/components/orderProductsCard";
 
 const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Use Redux state instead of local state
   const dispatch = useAppDispatch();
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
@@ -89,21 +89,7 @@ const Orders = () => {
           </div>
         </div>
 
-        <div
-          className={clsx("card shadow-sm position-relative", styles.card, {
-            "d-none": !isOpenAsideContainer,
-          })}
-        >
-          <div className="card-body">
-            <i
-              className="bi bi-x-circle-fill text-secondary fs-3 position-absolute top-0 start-100 translate-middle"
-              onClick={() => {
-                dispatch(toggleAsideContainer(false));
-                dispatch(setSelectedOrderId(null));
-              }}
-            ></i>
-          </div>
-        </div>
+        <OrderProductsCard />
       </div>
     </div>
   );
