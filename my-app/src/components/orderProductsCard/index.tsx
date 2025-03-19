@@ -45,9 +45,7 @@ const OrderProductsCard = () => {
               <h5 className="mb-3">{selectedOrderTitle}</h5>
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => (
-                  <>
-                    <ProductCard key={product.id} product={product} />
-                  </>
+                  <ProductCard key={product.id} product={product} />
                 ))
               ) : (
                 <p>No products found for this order.</p>

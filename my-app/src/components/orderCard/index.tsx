@@ -1,7 +1,13 @@
 import { OrderCardProps } from "@/types";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-
+import { useState } from "react";
+import ModalWindow from "../modalWindow";
 import styles from "./index.module.css";
+import {
+  setSelectedOrderId,
+  setSelectedOrderTitle,
+  toggleAsideContainer,
+} from "@/lib/features/orders/ordersSlice";
 
 const OrderCard: React.FC<OrderCardProps> = ({
   orderId,
@@ -12,47 +18,72 @@ const OrderCard: React.FC<OrderCardProps> = ({
   priceUSD,
   priceUAH,
 }) => {
+  const [showModal, setShowModal] = useState(false);
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
   );
   const selectedOrderId = useAppSelector(
     (state) => state.orders.selectedOrderId
   );
+
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
+
+  const dispatch = useAppDispatch();
   return (
-    <div className={`card shadow-sm ${styles.card}`}>
-      <div className="card-body">
-        <div className="d-flex justify-content-between align-items-center gap-5">
-          <div
-            className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5 ${styles.cardContent}`}
-          >
-            {!isOpenAsideContainer && (
-              <h5 className="card-title flex-grow-1 m-0">{title}</h5>
-            )}
-            <div className="flex-shrink-0">
-              <span className="fw-semibold">{productsCount}</span>
-              <span className="text-muted">{` Продукта`}</span>
-            </div>
-            <div className="d-flex flex-column align-items-center flex-shrink-0">
-              <div className="text-muted">{dateShort}</div>
-              <div className="text-muted fs-5">{date}</div>
-            </div>
-            {!isOpenAsideContainer && (
-              <div className="d-flex flex-column">
-                <div className="text-muted fs-6">{priceUSD} USD</div>
-                <div className="text-muted fw-medium fs-5">{priceUAH} UAH</div>
+    <>
+      <div className={`card shadow-sm ${styles.card}`}>
+        <div className="card-body">
+          <div className="d-flex justify-content-between align-items-center gap-5">
+            <div
+              className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5 ${styles.cardContent}`}
+              onClick={() => {
+                dispatch(toggleAsideContainer(true));
+                dispatch(setSelectedOrderId(String(orderId)));
+                dispatch(setSelectedOrderTitle(String(title)));
+              }}
+            >
+              {!isOpenAsideContainer && (
+                <h5 className="card-title flex-grow-1 m-0">{title}</h5>
+              )}
+              <div className="flex-shrink-0">
+                <span className="fw-semibold">{productsCount}</span>
+                <span className="text-muted">{` Продукта`}</span>
               </div>
+              <div className="d-flex flex-column align-items-center flex-shrink-0">
+                <div className="text-muted">{dateShort}</div>
+                <div className="text-muted fs-5">{date}</div>
+              </div>
+              {!isOpenAsideContainer && (
+                <div className="d-flex flex-column">
+                  <div className="text-muted fs-6">{priceUSD} USD</div>
+                  <div className="text-muted fw-medium fs-5">
+                    {priceUAH} UAH
+                  </div>
+                </div>
+              )}
+            </div>
+            {selectedOrderId === orderId ? (
+              <i className="bi bi-play-fill text-info fs-1"></i>
+            ) : (
+              <button className="btn btn-sm" onClick={handleOpenModal}>
+                <i className={`bi bi-trash ${styles.icon}`}></i>
+              </button>
             )}
           </div>
-          {selectedOrderId === orderId ? (
-            <i className="bi bi-play-fill text-info fs-1"></i>
-          ) : (
-            <button className="btn btn-sm">
-              <i className={`bi bi-trash ${styles.icon}`}></i>
-            </button>
-          )}
         </div>
       </div>
-    </div>
+
+      {showModal && (
+        <ModalWindow
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          title={`Удалить заказ "${title}"?`}
+          orderId={orderId}
+        />
+      )}
+    </>
   );
 };
 
