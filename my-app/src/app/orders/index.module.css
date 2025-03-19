@@ -1,5 +1,8 @@
-.asideContainer {
-  /* width: 200px;
-  height: 200px; */
-  border: 1px solid black;
+.card {
+  width: 70%;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.orders {
+  width: 30%;
 }

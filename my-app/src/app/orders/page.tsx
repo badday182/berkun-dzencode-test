@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import OrderCard from "@/components/orderCard";
+import {
+  toggleAsideContainer,
+  setSelectedOrderId,
+} from "@/lib/features/orders/ordersSlice";
 import { formatDate, formatDateShort } from "@/utils/formatDate";
 import getOrderStats from "@/utils/getOrderStats";
 import { Order, Product } from "@/types";
 import { ordersData, productsData } from "@/base/app";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import {
-  toggleAsideContainer,
-  setSelectedOrderId,
-} from "@/lib/features/orders/ordersSlice";
+import OrderCard from "@/components/orderCard";
+import clsx from "clsx";
 
 import styles from "./index.module.css";
 
@@ -55,7 +56,8 @@ const Orders = () => {
     <div className="container">
       <h1 className="mb-4">Orders</h1>
       <div className="container mt-3 d-flex flex-row">
-        <div className={`${isOpenAsideContainer ? "w-50" : ""}`}>
+        {/* <div className={clsx("", { "w-30": isOpenAsideContainer })}> */}
+        <div className={clsx("", { orders: isOpenAsideContainer })}>
           <div>
             {orders.map((order) => {
               const { productsCount, priceUSD, priceUAH } = getOrderStats(
@@ -85,19 +87,20 @@ const Orders = () => {
             })}
           </div>
         </div>
+
         <div
-          className={`${isOpenAsideContainer ? "w-50" : "d-none"} ${
-            styles.asideContainer
-          }`}
+          className={clsx("card shadow-sm", styles.card, {
+            "d-none": !isOpenAsideContainer,
+          })}
         >
-          {/* You can add a close button here */}
-          <button
-            className="btn btn-sm btn-light"
-            onClick={() => dispatch(toggleAsideContainer(false))}
-          >
-            Close
-          </button>
-          {/* Content of the aside container */}
+          <div className="card-body">
+            <button
+              className="btn btn-sm btn-light"
+              onClick={() => dispatch(toggleAsideContainer(false))}
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>

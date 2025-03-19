@@ -33,3 +33,12 @@ export interface OrderStats {
   priceUSD: number;
   priceUAH: number;
 }
+
+export interface OrderCardProps {
+  title: string;
+  productsCount: number;
+  date: string;
+  dateShort: string;
+  priceUSD: number;
+  priceUAH: number;
+}
