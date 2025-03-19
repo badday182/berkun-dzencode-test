@@ -90,20 +90,18 @@ const Orders = () => {
         </div>
 
         <div
-          className={clsx("card shadow-sm", styles.card, {
+          className={clsx("card shadow-sm position-relative", styles.card, {
             "d-none": !isOpenAsideContainer,
           })}
         >
           <div className="card-body">
-            <button
-              className="btn btn-sm btn-light"
+            <i
+              className="bi bi-x-circle-fill text-secondary fs-3 position-absolute top-0 start-100 translate-middle"
               onClick={() => {
                 dispatch(toggleAsideContainer(false));
                 dispatch(setSelectedOrderId(null));
               }}
-            >
-              Close
-            </button>
+            ></i>
           </div>
         </div>
       </div>
