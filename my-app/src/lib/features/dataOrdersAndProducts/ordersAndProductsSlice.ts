@@ -19,11 +19,17 @@ export const ordersAndProductsSlice = createSlice({
     setOrders: (state, action: PayloadAction<Order[]>) => {
       state.orders = action.payload;
     },
+    deleteOrder: (state, action: PayloadAction<string>) => {
+      state.orders = state.orders.filter(
+        (order) => order.id !== Number(action.payload)
+      );
+    },
     setProducts: (state, action: PayloadAction<Product[]>) => {
       state.products = action.payload;
     },
   },
 });
 
-export const { setOrders, setProducts } = ordersAndProductsSlice.actions;
+export const { setOrders, setProducts, deleteOrder } =
+  ordersAndProductsSlice.actions;
 export default ordersAndProductsSlice.reducer;
