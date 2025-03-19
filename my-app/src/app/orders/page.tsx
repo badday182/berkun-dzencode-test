@@ -12,6 +12,7 @@ import { ordersData, productsData } from "@/base/app";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import OrderCard from "@/components/orderCard";
 import clsx from "clsx";
+import { motion } from "framer-motion";
 
 import styles from "./index.module.css";
 import OrderProductsCard from "@/components/orderProductsCard";
@@ -62,6 +63,21 @@ const Orders = () => {
   // Create array of 8 placeholders
   const placeholders = Array(8).fill(null);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  };
+
   return (
     <div className="container">
       <h1 className="mb-4">Orders</h1>
@@ -75,26 +91,36 @@ const Orders = () => {
                 ))}
               </div>
             ) : (
-              orders.map((order) => {
-                const { productsCount, priceUSD, priceUAH } = getOrderStats(
-                  order.id,
-                  products
-                );
-                return (
-                  <div className="container mb-3" key={order.id}>
-                    <OrderCard
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {orders.map((order) => {
+                  const { productsCount, priceUSD, priceUAH } = getOrderStats(
+                    order.id,
+                    products
+                  );
+                  return (
+                    <motion.div
+                      className="container mb-3"
                       key={order.id}
-                      orderId={String(order.id)}
-                      title={order.title}
-                      productsCount={productsCount}
-                      date={formatDate(order.date)}
-                      dateShort={formatDateShort(order.date)}
-                      priceUSD={priceUSD}
-                      priceUAH={priceUAH}
-                    />
-                  </div>
-                );
-              })
+                      variants={itemVariants}
+                    >
+                      <OrderCard
+                        key={order.id}
+                        orderId={String(order.id)}
+                        title={order.title}
+                        productsCount={productsCount}
+                        date={formatDate(order.date)}
+                        dateShort={formatDateShort(order.date)}
+                        priceUSD={priceUSD}
+                        priceUAH={priceUAH}
+                      />
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
             )}
           </div>
         </div>

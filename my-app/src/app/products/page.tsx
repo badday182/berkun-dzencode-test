@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { ordersData, productsData } from "@/base/app";
 import SelectCustom from "@/components/select";
 import CardPlaceholder from "@/components/cardPlaceholder";
+import { motion } from "framer-motion";
 
 const Products = () => {
   const [loading, setLoading] = useState(true);
@@ -57,6 +58,21 @@ const Products = () => {
   // Create array of 8 placeholders
   const placeholders = Array(8).fill(null);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  };
+
   return (
     <div className="container">
       <h1 className="mb-4">Products</h1>
@@ -68,15 +84,22 @@ const Products = () => {
           ))}
         </div>
       ) : (
-        <div className="container mt-3 d-flex flex-column gap-3">
+        <motion.div
+          className="container mt-3 d-flex flex-column gap-3"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {filteredProducts && filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
-              <ProductsCard key={product.id} product={product} />
+              <motion.div key={product.id} variants={itemVariants}>
+                <ProductsCard product={product} />
+              </motion.div>
             ))
           ) : (
             <div className="alert alert-info">No products available</div>
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   );

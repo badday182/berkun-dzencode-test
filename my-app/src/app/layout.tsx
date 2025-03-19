@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavigationMenu from "@/components/navigationMenu";
 import StoreProvider from "./StoreProvider";
+import AnimatedLayout from "@/components/AnimatedLayout";
+import { ReactNode } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -22,16 +24,14 @@ export const metadata: Metadata = {
   description: "Orders & Products",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <NavigationMenu />
-        <StoreProvider>{children}</StoreProvider>
+        <StoreProvider>
+          <AnimatedLayout>{children}</AnimatedLayout>
+        </StoreProvider>
       </body>
     </html>
   );
