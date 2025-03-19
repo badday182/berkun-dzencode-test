@@ -16,11 +16,17 @@ import clsx from "clsx";
 
 import styles from "./index.module.css";
 import OrderProductsCard from "@/components/orderProductsCard";
+import {
+  setOrders,
+  setProducts,
+} from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
 
 const Orders = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const orders = useAppSelector((state) => state.ordersAndProductsData.orders);
+  const products = useAppSelector(
+    (state) => state.ordersAndProductsData.products
+  );
 
   const dispatch = useAppDispatch();
   const isOpenAsideContainer = useAppSelector(
@@ -34,13 +40,8 @@ const Orders = () => {
       try {
         // Simulating fetching the data
 
-        // const ordersData = [
-        // ];
-        // const productsData = [
-        // ];
-
-        setOrders(ordersData);
-        setProducts(productsData);
+        dispatch(setOrders(ordersData));
+        dispatch(setProducts(productsData));
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -57,7 +58,6 @@ const Orders = () => {
     <div className="container">
       <h1 className="mb-4">Orders</h1>
       <div className="container mt-3 d-flex flex-row">
-        {/* <div className={clsx("", { "w-30": isOpenAsideContainer })}> */}
         <div className={clsx("flex-grow-1", { orders: isOpenAsideContainer })}>
           <div>
             {orders.map((order) => {

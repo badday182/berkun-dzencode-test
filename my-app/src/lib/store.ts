@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import ordersReducer from "./features/orders/ordersSlice";
+import ordersAndProductsReducer from "./features/dataOrdersAndProducts/ordersAndProductsSlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       orders: ordersReducer,
+      ordersAndProductsData: ordersAndProductsReducer,
     },
   });
 };
