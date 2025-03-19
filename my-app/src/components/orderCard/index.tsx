@@ -15,7 +15,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
   );
-  const clickedOrderId = useAppSelector(
+  const selectedOrderId = useAppSelector(
     (state) => state.orders.selectedOrderId
   );
   return (
@@ -43,7 +43,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
               </div>
             )}
           </div>
-          {clickedOrderId === orderId ? (
+          {selectedOrderId === orderId ? (
             <i className="bi bi-play-fill text-info fs-1"></i>
           ) : (
             <button className="btn btn-sm">

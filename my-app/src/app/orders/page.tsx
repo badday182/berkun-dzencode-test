@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   toggleAsideContainer,
   setSelectedOrderId,
+  setSelectedOrderTitle,
 } from "@/lib/features/orders/ordersSlice";
 import { formatDate, formatDateShort } from "@/utils/formatDate";
 import getOrderStats from "@/utils/getOrderStats";
@@ -57,7 +58,7 @@ const Orders = () => {
       <h1 className="mb-4">Orders</h1>
       <div className="container mt-3 d-flex flex-row">
         {/* <div className={clsx("", { "w-30": isOpenAsideContainer })}> */}
-        <div className={clsx("", { orders: isOpenAsideContainer })}>
+        <div className={clsx("flex-grow-1", { orders: isOpenAsideContainer })}>
           <div>
             {orders.map((order) => {
               const { productsCount, priceUSD, priceUAH } = getOrderStats(
@@ -71,6 +72,7 @@ const Orders = () => {
                   onClick={() => {
                     dispatch(toggleAsideContainer(true));
                     dispatch(setSelectedOrderId(String(order.id)));
+                    dispatch(setSelectedOrderTitle(String(order.title)));
                   }}
                 >
                   <OrderCard

@@ -1,16 +1,41 @@
-import { ProductCardProps } from "@/types";
+import { Product } from "@/types";
 import styles from "./index.module.css";
 
-const ProductCard: React.FC<ProductCardProps> = ({
-  title = "Unknown Product",
-  productType = "Unknown Type",
-  guaranteeStartDate = "Unknown Date",
-  guaranteeEndDate = "Unknown Date",
-  priceUSD = "0",
-  priceUAH = "0",
-  date = "Unknown Receipt",
-  order = 0,
+const defaultProduct: Product = {
+  id: 0,
+  serialNumber: 7777777777,
+  isNew: 1,
+  photo: "",
+  title: "Default Product",
+  type: "Default",
+  specification: "",
+  guarantee: {
+    start: new Date().toISOString(),
+    end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  price: [
+    { value: 0, symbol: "USD", isDefault: 0 },
+    { value: 0, symbol: "UAH", isDefault: 1 },
+  ],
+  order: 0,
+  date: new Date().toISOString(),
+};
+
+const ProductCard: React.FC<{ product?: Product }> = ({
+  product = defaultProduct,
 }) => {
+  // Extract the default price (UAH) and USD price
+  //   const defaultPrice = product.price.find((p) => p.isDefault === 1);
+  const usdPrice = product.price.find((p) => p.symbol === "USD");
+  const uahPrice = product.price.find((p) => p.symbol === "UAH");
+
+  // Format the dates for display
+  const guaranteeStartDate = new Date(
+    product.guarantee.start
+  ).toLocaleDateString();
+  const guaranteeEndDate = new Date(product.guarantee.end).toLocaleDateString();
+  const receiptDate = new Date(product.date).toLocaleDateString();
+
   return (
     <div className={`card shadow-sm flex-grow-1 ${styles.card}`}>
       <div className="card-body">
@@ -19,9 +44,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5 ${styles.cardContent}`}
           >
             <div className="d-flex justify-content-between align-items-center gap-3 flex-grow-1">
-              <h5 className="card-title flex-grow-1 m-0">{title}</h5>
+              <h5 className="card-title flex-grow-1 m-0">{product.title}</h5>
               <span className="badge bg-secondary flex-shrink-0">
-                {productType}
+                {product.type}
               </span>
             </div>
 
@@ -37,13 +62,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             <div className="d-flex flex-column flex-shrink-0">
-              <div className="text-muted fs-6">{priceUSD} USD</div>
-              <div className="text-muted fw-medium fs-5">{priceUAH} UAH</div>
+              <div className="d-flex flex-column">
+                <div className="text-muted fs-6">{usdPrice?.value} USD</div>
+                <div className="text-muted fw-medium fs-5">
+                  {uahPrice?.value} UAH
+                </div>
+              </div>
             </div>
 
             <div className="d-flex flex-column flex-shrink-0">
               <div className="text-muted">Приход:</div>
-              <div className="fw-semibold">{date}</div>
+              <div className="fw-semibold">{receiptDate}</div>
             </div>
           </div>
 
