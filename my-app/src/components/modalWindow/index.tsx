@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useAppDispatch } from "@/lib/hooks";
 // import { deleteOrder } from "@/lib/features/orders/ordersSlice";
 
+import styles from "./index.module.css";
 interface ModalWindowProps {
   isOpen: boolean;
   onClose: () => void;
@@ -49,25 +50,9 @@ const ModalWindow: React.FC<ModalWindowProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div
-      className="modal-backdrop"
-      onClick={onClose}
-      style={{
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 1050,
-      }}
-    >
+    <div className={`modal-backdrop ${styles.modalBackdrop}`} onClick={onClose}>
       <div
-        className="modal fade show"
-        style={{ display: "block" }}
+        className="modal fade show d-block"
         role="dialog"
         aria-modal="true"
         ref={modalRef}
