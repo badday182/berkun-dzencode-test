@@ -8,6 +8,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useEffect, useState } from "react";
 import { ordersData, productsData } from "@/base/app";
+import SelectCustom from "@/components/select";
 
 const Products = () => {
   const [loading, setLoading] = useState(true);
@@ -16,11 +17,6 @@ const Products = () => {
   const products = useAppSelector(
     (state) => state.ordersAndProductsData.products
   );
-
-  // Get unique product types
-  const productTypes = products
-    ? ["all", ...new Set(products.map((product) => product.type))]
-    : ["all"];
 
   // Filter products by selected type
   const filteredProducts =
@@ -51,30 +47,16 @@ const Products = () => {
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, orders, products]);
 
-  const handleTypeChange = (event) => {
-    setSelectedType(event.target.value);
+  const handleTypeChange = (type) => {
+    setSelectedType(type);
   };
 
   return (
     <div className="container">
       <h1 className="mb-4">Products</h1>
-      <select
-        className="form-select"
-        aria-label="Filter products by type"
-        value={selectedType}
-        onChange={handleTypeChange}
-      >
-        <option value="all">Все типы</option>
-        {productTypes
-          .filter((type) => type !== "all")
-          .map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-      </select>
+      <SelectCustom products={products} onTypeChange={handleTypeChange} />
       {loading ? (
         <div className="text-center">Loading products...</div>
       ) : (
