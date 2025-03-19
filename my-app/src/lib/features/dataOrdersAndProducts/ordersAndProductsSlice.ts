@@ -27,9 +27,14 @@ export const ordersAndProductsSlice = createSlice({
     setProducts: (state, action: PayloadAction<Product[]>) => {
       state.products = action.payload;
     },
+    deleteProduct: (state, action: PayloadAction<number>) => {
+      state.products = state.products.filter(
+        (product) => product.id !== action.payload
+      );
+    },
   },
 });
 
-export const { setOrders, setProducts, deleteOrder } =
+export const { setOrders, setProducts, deleteOrder, deleteProduct } =
   ordersAndProductsSlice.actions;
 export default ordersAndProductsSlice.reducer;

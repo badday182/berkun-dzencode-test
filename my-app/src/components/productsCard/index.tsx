@@ -5,6 +5,8 @@ import styles from "./index.module.css";
 import { useAppSelector } from "@/lib/hooks";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import ModalWindow from "../modalWindow";
 const defaultProduct: Product = {
   id: 0,
   serialNumber: 7777777777,
@@ -28,8 +30,6 @@ const defaultProduct: Product = {
 const ProductCard: React.FC<{ product?: Product }> = ({
   product = defaultProduct,
 }) => {
-  // Extract the default price (UAH) and USD price
-  //   const defaultPrice = product.price.find((p) => p.isDefault === 1);
   const usdPrice = product.price.find((p) => p.symbol === "USD");
   const uahPrice = product.price.find((p) => p.symbol === "UAH");
 
@@ -39,6 +39,11 @@ const ProductCard: React.FC<{ product?: Product }> = ({
   ).toLocaleDateString();
   const guaranteeEndDate = new Date(product.guarantee.end).toLocaleDateString();
   // const receiptDate = new Date(product.date).toLocaleDateString();
+
+  const [showModal, setShowModal] = useState(false);
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
 
   const orders = useAppSelector((state) => state.ordersAndProductsData.orders);
 
@@ -50,62 +55,77 @@ const ProductCard: React.FC<{ product?: Product }> = ({
     (state) => state.orders.isOpenAsideContainer
   );
   const pathname = usePathname();
+
   return (
-    <div className={`card shadow-sm flex-grow-1 ${styles.card}`}>
-      <div className="card-body">
-        <div className="d-flex justify-content-between align-items-center gap-5">
-          <div
-            className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5 ${styles.cardContent}`}
-          >
-            <div className="d-flex justify-content-between align-items-center gap-3 flex-grow-1">
-              <h5 className="card-title flex-grow-1 m-0">{product.title}</h5>
-              <span
-                className={`badge bg-secondary flex-shrink-0 ${styles.wordWrap}`}
-              >
-                {product.type}
-              </span>
-            </div>
-
-            <div className="d-flex flex-column align-items-center flex-shrink-0">
-              <div>
-                <span className="text-muted">с: </span>
-                <span className="text-muted">{guaranteeStartDate}</span>
+    <>
+      <div className={`card shadow-sm flex-grow-1 ${styles.card}`}>
+        <div className="card-body">
+          <div className="d-flex justify-content-between align-items-center gap-5">
+            <div
+              className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5 ${styles.cardContent}`}
+            >
+              <div className="d-flex justify-content-between align-items-center gap-3 flex-grow-1">
+                <h5 className="card-title flex-grow-1 m-0">{product.title}</h5>
+                <span
+                  className={`badge bg-secondary flex-shrink-0 ${styles.wordWrap}`}
+                >
+                  {product.type}
+                </span>
               </div>
-              <div>
-                <span className="text-muted">по: </span>
-                <span className="text-muted fs-6">{guaranteeEndDate}</span>
-              </div>
-            </div>
 
-            <div className="d-flex flex-column flex-shrink-0">
-              <div className="d-flex flex-column">
-                <div className="text-muted fs-6">{usdPrice?.value} USD</div>
-                <div className="text-muted fw-medium fs-5">
-                  {uahPrice?.value} UAH
+              <div className="d-flex flex-column align-items-center flex-shrink-0">
+                <div>
+                  <span className="text-muted">с: </span>
+                  <span className="text-muted">{guaranteeStartDate}</span>
+                </div>
+                <div>
+                  <span className="text-muted">по: </span>
+                  <span className="text-muted fs-6">{guaranteeEndDate}</span>
                 </div>
               </div>
+
+              <div className="d-flex flex-column flex-shrink-0">
+                <div className="d-flex flex-column">
+                  <div className="text-muted fs-6">{usdPrice?.value} USD</div>
+                  <div className="text-muted fw-medium fs-5">
+                    {uahPrice?.value} UAH
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={clsx(
+                  "text-muted d-flex flex-column flex-shrink-0",
+                  styles.wordWrap,
+                  styles.smallFontSize,
+                  {
+                    "d-none": isOpenAsideContainer && pathname === "/orders",
+                  }
+                )}
+              >
+                {orderTitle}
+              </div>
             </div>
 
-            <div
-              className={clsx(
-                "text-muted d-flex flex-column flex-shrink-0",
-                styles.wordWrap,
-                styles.smallFontSize,
-                {
-                  "d-none": isOpenAsideContainer && pathname === "/orders",
-                }
-              )}
-            >
-              {orderTitle}
-            </div>
+            <button className="btn btn-sm">
+              <i
+                className={`bi bi-trash ${styles.icon}`}
+                onClick={handleOpenModal}
+              ></i>
+            </button>
           </div>
-
-          <button className="btn btn-sm">
-            <i className={`bi bi-trash ${styles.icon}`}></i>
-          </button>
         </div>
       </div>
-    </div>
+      {showModal && (
+        <ModalWindow
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          title={`Удалить продукт "${product.title}"?`}
+          category="product"
+          id={product.id}
+        />
+      )}
+    </>
   );
 };
 

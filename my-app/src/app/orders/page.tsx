@@ -49,7 +49,7 @@ const Orders = () => {
     };
 
     fetchData();
-  }, []);
+  }, [dispatch]);
 
   if (loading) return <div>Loading...</div>;
 

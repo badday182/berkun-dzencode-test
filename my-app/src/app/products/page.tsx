@@ -23,9 +23,8 @@ const Products = () => {
     const fetchData = async () => {
       try {
         // Simulating fetching the data
-
-        !!orders ? dispatch(setOrders(ordersData)) : null;
-        !!products ? dispatch(setProducts(productsData)) : null;
+        dispatch(setOrders(ordersData));
+        dispatch(setProducts(productsData));
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -34,13 +33,24 @@ const Products = () => {
     };
 
     fetchData();
-  }, []);
+  }, [dispatch]);
+
   return (
     <div className="container">
       <h1 className="mb-4">Products</h1>
-      <div className="container mt-3 d-flex flex-row">
-        <ProductsCard />
-      </div>
+      {loading ? (
+        <div className="text-center">Loading products...</div>
+      ) : (
+        <div className="container mt-3 d-flex flex-column gap-3">
+          {products && products.length > 0 ? (
+            products.map((product) => (
+              <ProductsCard key={product.id} product={product} />
+            ))
+          ) : (
+            <div className="alert alert-info">No products available</div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

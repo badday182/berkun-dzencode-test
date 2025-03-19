@@ -84,7 +84,8 @@ const OrderCard: React.FC<OrderCardProps> = ({
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           title={`Удалить заказ "${title}"?`}
-          orderId={orderId}
+          category="order"
+          id={orderId}
         />
       )}
     </>

@@ -3,19 +3,24 @@ import { useAppDispatch } from "@/lib/hooks";
 // import { deleteOrder } from "@/lib/features/orders/ordersSlice";
 
 import styles from "./index.module.css";
-import { deleteOrder } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
+import {
+  deleteOrder,
+  deleteProduct,
+} from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
 interface ModalWindowProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  orderId: string;
+  id: string | number;
+  category: string;
 }
 
 const ModalWindow: React.FC<ModalWindowProps> = ({
   isOpen,
   onClose,
   title,
-  orderId,
+  id,
+  category,
 }) => {
   const dispatch = useAppDispatch();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -44,7 +49,12 @@ const ModalWindow: React.FC<ModalWindowProps> = ({
   }, [isOpen, onClose]);
 
   const handleDelete = () => {
-    dispatch(deleteOrder(orderId));
+    if (category === "order") {
+      dispatch(deleteOrder(String(id)));
+    }
+    if (category === "product") {
+      dispatch(deleteProduct(id));
+    }
     onClose();
   };
 
