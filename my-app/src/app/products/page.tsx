@@ -50,7 +50,7 @@ const Products = () => {
     fetchData();
   }, [dispatch, orders, products]);
 
-  const handleTypeChange = (type) => {
+  const handleTypeChange = (type: string) => {
     setSelectedType(type);
   };
 
