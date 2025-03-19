@@ -90,7 +90,11 @@ const ModalWindow: React.FC<ModalWindowProps> = ({
               />
             </div>
             <div className="modal-body">
-              <p>Вы уверены, что хотите удалить этот заказ?</p>
+              <p>
+                {category === "order"
+                  ? "Вы уверены, что хотите удалить этот заказ  и все его продукты?"
+                  : "Вы уверены, что хотите удалить этот продукт?"}
+              </p>
             </div>
             <div className="modal-footer">
               <button
