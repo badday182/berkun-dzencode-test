@@ -45,7 +45,9 @@ const ProductCard: React.FC<{ product?: Product }> = ({
           >
             <div className="d-flex justify-content-between align-items-center gap-3 flex-grow-1">
               <h5 className="card-title flex-grow-1 m-0">{product.title}</h5>
-              <span className="badge bg-secondary flex-shrink-0">
+              <span
+                className={`badge bg-secondary flex-shrink-0 ${styles.type}`}
+              >
                 {product.type}
               </span>
             </div>
