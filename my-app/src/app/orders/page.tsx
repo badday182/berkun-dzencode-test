@@ -66,15 +66,7 @@ const Orders = () => {
                 products
               );
               return (
-                <div
-                  className="container mb-3"
-                  key={order.id}
-                  // onClick={() => {
-                  //   dispatch(toggleAsideContainer(true));
-                  //   dispatch(setSelectedOrderId(String(order.id)));
-                  //   dispatch(setSelectedOrderTitle(String(order.title)));
-                  // }}
-                >
+                <div className="container mb-3" key={order.id}>
                   <OrderCard
                     key={order.id}
                     orderId={String(order.id)}

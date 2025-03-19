@@ -33,16 +33,20 @@ const OrderCard: React.FC<OrderCardProps> = ({
   const dispatch = useAppDispatch();
   return (
     <>
-      <div className={`card shadow-sm ${styles.card}`}>
-        <div className="card-body">
+      <div
+        className={`card shadow-sm d-flex flex-row justify-content-between align-items-center ${styles.card}`}
+      >
+        <div
+          className={`card-body ${styles.cardContent}`}
+          onClick={() => {
+            dispatch(toggleAsideContainer(true));
+            dispatch(setSelectedOrderId(String(orderId)));
+            dispatch(setSelectedOrderTitle(String(title)));
+          }}
+        >
           <div className="d-flex justify-content-between align-items-center gap-5">
             <div
-              className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5 ${styles.cardContent}`}
-              onClick={() => {
-                dispatch(toggleAsideContainer(true));
-                dispatch(setSelectedOrderId(String(orderId)));
-                dispatch(setSelectedOrderTitle(String(title)));
-              }}
+              className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5`}
             >
               {!isOpenAsideContainer && (
                 <h5 className="card-title flex-grow-1 m-0">{title}</h5>
@@ -64,15 +68,15 @@ const OrderCard: React.FC<OrderCardProps> = ({
                 </div>
               )}
             </div>
-            {selectedOrderId === orderId ? (
-              <i className="bi bi-play-fill text-info fs-1"></i>
-            ) : (
-              <button className="btn btn-sm" onClick={handleOpenModal}>
-                <i className={`bi bi-trash ${styles.icon}`}></i>
-              </button>
-            )}
           </div>
         </div>
+        {selectedOrderId === orderId ? (
+          <i className="bi bi-play-fill text-info fs-4 pe-3"></i>
+        ) : (
+          <button className="btn btn-sm" onClick={handleOpenModal}>
+            <i className={`bi bi-trash pe-3 ${styles.icon}`}></i>
+          </button>
+        )}
       </div>
 
       {showModal && (
