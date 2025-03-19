@@ -38,9 +38,14 @@ const Orders = () => {
     const fetchData = async () => {
       try {
         // Simulating fetching the data
+        // Only dispatch if orders or products are empty/null
+        if (!orders || orders.length === 0) {
+          dispatch(setOrders(ordersData));
+        }
 
-        !!orders ? dispatch(setOrders(ordersData)) : null;
-        !!products ? dispatch(setProducts(productsData)) : null;
+        if (!products || products.length === 0) {
+          dispatch(setProducts(productsData));
+        }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);

@@ -24,6 +24,11 @@ export const ordersAndProductsSlice = createSlice({
         (order) => order.id !== Number(action.payload)
       );
     },
+    deleteAllOrderProduct: (state, action: PayloadAction<number>) => {
+      state.products = state.products.filter(
+        (product) => product.order !== action.payload
+      );
+    },
     setProducts: (state, action: PayloadAction<Product[]>) => {
       state.products = action.payload;
     },
@@ -35,6 +40,11 @@ export const ordersAndProductsSlice = createSlice({
   },
 });
 
-export const { setOrders, setProducts, deleteOrder, deleteProduct } =
-  ordersAndProductsSlice.actions;
+export const {
+  setOrders,
+  setProducts,
+  deleteOrder,
+  deleteProduct,
+  deleteAllOrderProduct,
+} = ordersAndProductsSlice.actions;
 export default ordersAndProductsSlice.reducer;
