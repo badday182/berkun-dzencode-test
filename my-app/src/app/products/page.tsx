@@ -11,10 +11,22 @@ import { ordersData, productsData } from "@/base/app";
 
 const Products = () => {
   const [loading, setLoading] = useState(true);
+  const [selectedType, setSelectedType] = useState("all");
   const orders = useAppSelector((state) => state.ordersAndProductsData.orders);
   const products = useAppSelector(
     (state) => state.ordersAndProductsData.products
   );
+
+  // Get unique product types
+  const productTypes = products
+    ? ["all", ...new Set(products.map((product) => product.type))]
+    : ["all"];
+
+  // Filter products by selected type
+  const filteredProducts =
+    selectedType === "all"
+      ? products
+      : products?.filter((product) => product.type === selectedType);
 
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -41,15 +53,34 @@ const Products = () => {
     fetchData();
   }, [dispatch]);
 
+  const handleTypeChange = (event) => {
+    setSelectedType(event.target.value);
+  };
+
   return (
     <div className="container">
       <h1 className="mb-4">Products</h1>
+      <select
+        className="form-select"
+        aria-label="Filter products by type"
+        value={selectedType}
+        onChange={handleTypeChange}
+      >
+        <option value="all">Все типы</option>
+        {productTypes
+          .filter((type) => type !== "all")
+          .map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+      </select>
       {loading ? (
         <div className="text-center">Loading products...</div>
       ) : (
         <div className="container mt-3 d-flex flex-column gap-3">
-          {products && products.length > 0 ? (
-            products.map((product) => (
+          {filteredProducts && filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
               <ProductsCard key={product.id} product={product} />
             ))
           ) : (

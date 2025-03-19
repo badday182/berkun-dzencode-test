@@ -30,7 +30,6 @@ const ModalWindow: React.FC<ModalWindowProps> = ({
   const dispatch = useAppDispatch();
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  console.log("id - ", id);
   useEffect(() => {
     if (isOpen) {
       // Focus the close button when modal opens
