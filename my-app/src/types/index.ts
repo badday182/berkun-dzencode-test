@@ -43,3 +43,13 @@ export interface OrderCardProps {
   priceUSD: number;
   priceUAH: number;
 }
+export interface ProductCardProps {
+  title: string;
+  productType: string;
+  guaranteeStartDate: string;
+  guaranteeEndDate: string;
+  priceUSD: string;
+  priceUAH: string;
+  date: string;
+  order: number;
+}
