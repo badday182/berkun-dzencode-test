@@ -3,7 +3,6 @@ import {
   toggleAsideContainer,
 } from "@/lib/features/orders/ordersSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { productsData } from "@/base/app";
 import clsx from "clsx";
 
 import styles from "./index.module.css";
@@ -11,6 +10,9 @@ import ProductCard from "../productsCard";
 
 const OrderProductsCard = () => {
   const dispatch = useAppDispatch();
+  const products = useAppSelector(
+    (state) => state.ordersAndProductsData.products
+  );
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
   );
@@ -21,7 +23,7 @@ const OrderProductsCard = () => {
     (state) => state.orders.selectedOrderTitle
   );
 
-  const filteredProducts = productsData.filter(
+  const filteredProducts = products.filter(
     (product) => String(product.order) === selectedOrderId
   );
 
