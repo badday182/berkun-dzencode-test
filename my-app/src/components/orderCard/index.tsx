@@ -8,6 +8,7 @@ import {
   setSelectedOrderTitle,
   toggleAsideContainer,
 } from "@/lib/features/orders/ordersSlice";
+import clsx from "clsx";
 
 const OrderCard: React.FC<OrderCardProps> = ({
   orderId,
@@ -34,7 +35,13 @@ const OrderCard: React.FC<OrderCardProps> = ({
   return (
     <>
       <div
-        className={`card shadow-sm d-flex flex-row justify-content-between align-items-center ${styles.card}`}
+        // className={`card shadow-sm d-flex flex-row justify-content-between align-items-center ${styles.card}`}
+        className={clsx(
+          "card shadow-sm d-flex flex-row justify-content-between align-items-center ${styles.card}",
+          {
+            "bg-primary-subtle": selectedOrderId == orderId,
+          }
+        )}
       >
         <div
           className={`card-body ${styles.cardContent}`}

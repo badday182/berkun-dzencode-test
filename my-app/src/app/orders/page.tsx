@@ -31,7 +31,9 @@ const Orders = () => {
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
   );
-
+  const selectedOrderId = useAppSelector(
+    (state) => state.orders.selectedOrderId
+  );
   useEffect(() => {
     // In a real application need fetch data
     // This is a demonstration
