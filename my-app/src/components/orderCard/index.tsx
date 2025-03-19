@@ -37,9 +37,12 @@ const OrderCard: React.FC<OrderCardProps> = ({
       <div
         // className={`card shadow-sm d-flex flex-row justify-content-between align-items-center ${styles.card}`}
         className={clsx(
-          "card shadow-sm d-flex flex-row justify-content-between align-items-center ${styles.card}",
+          "card shadow-sm d-flex flex-row justify-content-between align-items-center",
+          styles.card,
           {
             "bg-primary-subtle": selectedOrderId == orderId,
+            "transition-shadow": true,
+            "hover-shadow-lg": true,
           }
         )}
       >

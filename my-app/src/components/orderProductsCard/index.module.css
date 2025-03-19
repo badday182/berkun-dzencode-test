@@ -2,3 +2,11 @@
   width: 70%;
   /* box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; */
 }
+.icon {
+  transition: box-shadow 0.3s ease;
+  cursor: pointer;
+}
+.icon:hover::before {
+  color: red;
+  opacity: 0.9;
+}

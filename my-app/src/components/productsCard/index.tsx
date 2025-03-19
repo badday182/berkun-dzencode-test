@@ -62,7 +62,7 @@ const ProductCard: React.FC<{ product?: Product }> = ({
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-center gap-5">
             <div
-              className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5 ${styles.cardContent}`}
+              className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5`}
             >
               <div className="d-flex justify-content-between align-items-center gap-3 flex-grow-1">
                 <h5 className="card-title flex-grow-1 m-0">{product.title}</h5>

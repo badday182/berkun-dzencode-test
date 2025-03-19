@@ -48,7 +48,10 @@ const OrderProductsCard = () => {
       >
         <div className="card-body">
           <i
-            className="bi bi-x-circle-fill text-secondary fs-3 position-absolute top-0 start-100 translate-middle"
+            className={clsx(
+              "bi bi-x-circle-fill text-danger opacity-75 fs-3 position-absolute top-0 start-100 translate-middle",
+              styles.icon
+            )}
             onClick={closeModal}
           ></i>
           {selectedOrderId && (
