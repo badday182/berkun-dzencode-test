@@ -19,6 +19,7 @@ import {
   setOrders,
   setProducts,
 } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
+import CardPlaceholder from "@/components/cardPlaceholder";
 
 const Orders = () => {
   const [loading, setLoading] = useState(true);
@@ -58,7 +59,8 @@ const Orders = () => {
     fetchData();
   }, [dispatch]);
 
-  if (loading) return <div>Loading...</div>;
+  // Create array of 8 placeholders
+  const placeholders = Array(8).fill(null);
 
   return (
     <div className="container">
@@ -66,26 +68,34 @@ const Orders = () => {
       <div className="container mt-3 d-flex flex-row">
         <div className={clsx("flex-grow-1", { orders: isOpenAsideContainer })}>
           <div>
-            {orders.map((order) => {
-              const { productsCount, priceUSD, priceUAH } = getOrderStats(
-                order.id,
-                products
-              );
-              return (
-                <div className="container mb-3" key={order.id}>
-                  <OrderCard
-                    key={order.id}
-                    orderId={String(order.id)}
-                    title={order.title}
-                    productsCount={productsCount}
-                    date={formatDate(order.date)}
-                    dateShort={formatDateShort(order.date)}
-                    priceUSD={priceUSD}
-                    priceUAH={priceUAH}
-                  />
-                </div>
-              );
-            })}
+            {loading ? (
+              <div className="container mt-3 d-flex flex-column gap-3">
+                {placeholders.map((_, index) => (
+                  <CardPlaceholder key={`placeholder-${index}`} />
+                ))}
+              </div>
+            ) : (
+              orders.map((order) => {
+                const { productsCount, priceUSD, priceUAH } = getOrderStats(
+                  order.id,
+                  products
+                );
+                return (
+                  <div className="container mb-3" key={order.id}>
+                    <OrderCard
+                      key={order.id}
+                      orderId={String(order.id)}
+                      title={order.title}
+                      productsCount={productsCount}
+                      date={formatDate(order.date)}
+                      dateShort={formatDateShort(order.date)}
+                      priceUSD={priceUSD}
+                      priceUAH={priceUAH}
+                    />
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 

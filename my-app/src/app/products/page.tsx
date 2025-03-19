@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useEffect, useState } from "react";
 import { ordersData, productsData } from "@/base/app";
 import SelectCustom from "@/components/select";
+import CardPlaceholder from "@/components/cardPlaceholder";
 
 const Products = () => {
   const [loading, setLoading] = useState(true);
@@ -53,12 +54,19 @@ const Products = () => {
     setSelectedType(type);
   };
 
+  // Create array of 8 placeholders
+  const placeholders = Array(8).fill(null);
+
   return (
     <div className="container">
       <h1 className="mb-4">Products</h1>
       <SelectCustom products={products} onTypeChange={handleTypeChange} />
       {loading ? (
-        <div className="text-center">Loading products...</div>
+        <div className="container mt-3 d-flex flex-column gap-3">
+          {placeholders.map((_, index) => (
+            <CardPlaceholder key={`placeholder-${index}`} />
+          ))}
+        </div>
       ) : (
         <div className="container mt-3 d-flex flex-column gap-3">
           {filteredProducts && filteredProducts.length > 0 ? (
