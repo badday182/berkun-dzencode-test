@@ -35,6 +35,7 @@ export interface OrderStats {
 }
 
 export interface OrderCardProps {
+  orderId: string;
   title: string;
   productsCount: number;
   date: string;

@@ -70,11 +70,12 @@ const Orders = () => {
                   key={order.id}
                   onClick={() => {
                     dispatch(toggleAsideContainer(true));
-                    // dispatch(setSelectedOrderId(order.id));
+                    dispatch(setSelectedOrderId(String(order.id)));
                   }}
                 >
                   <OrderCard
                     key={order.id}
+                    orderId={String(order.id)}
                     title={order.title}
                     productsCount={productsCount}
                     date={formatDate(order.date)}
@@ -96,7 +97,10 @@ const Orders = () => {
           <div className="card-body">
             <button
               className="btn btn-sm btn-light"
-              onClick={() => dispatch(toggleAsideContainer(false))}
+              onClick={() => {
+                dispatch(toggleAsideContainer(false));
+                dispatch(setSelectedOrderId(null));
+              }}
             >
               Close
             </button>

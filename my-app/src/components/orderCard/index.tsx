@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import styles from "./index.module.css";
 
 const OrderCard: React.FC<OrderCardProps> = ({
+  orderId,
   title,
   productsCount,
   date,
@@ -13,6 +14,9 @@ const OrderCard: React.FC<OrderCardProps> = ({
 }) => {
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
+  );
+  const clickedOrderId = useAppSelector(
+    (state) => state.orders.selectedOrderId
   );
   return (
     <div className={`card shadow-sm ${styles.card}`}>
@@ -39,9 +43,13 @@ const OrderCard: React.FC<OrderCardProps> = ({
               </div>
             )}
           </div>
-          <button className="btn btn-sm">
-            <i className={`bi bi-trash ${styles.icon}`}></i>
-          </button>
+          {clickedOrderId === orderId ? (
+            <i className="bi bi-play-fill text-info fs-1"></i>
+          ) : (
+            <button className="btn btn-sm">
+              <i className={`bi bi-trash ${styles.icon}`}></i>
+            </button>
+          )}
         </div>
       </div>
     </div>
