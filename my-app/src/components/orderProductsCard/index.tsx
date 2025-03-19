@@ -42,7 +42,12 @@ const OrderProductsCard = () => {
         {selectedOrderId && (
           <div>
             <div className="product-list gap-3 d-flex flex-column">
-              <h5 className="mb-3">{selectedOrderTitle}</h5>
+              <div className="d-flex flex-row justify-content-between">
+                <h5 className="mb-3">{selectedOrderTitle}</h5>
+                <button className="btn btn-sm">
+                  <i className={`bi bi-trash pe-2 ${styles.icon}`}></i>
+                </button>
+              </div>
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />

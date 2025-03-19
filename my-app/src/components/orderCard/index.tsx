@@ -71,10 +71,10 @@ const OrderCard: React.FC<OrderCardProps> = ({
           </div>
         </div>
         {selectedOrderId === orderId ? (
-          <i className="bi bi-play-fill text-info fs-4 pe-3"></i>
+          <i className="bi bi-play-fill text-info fs-4 pe-2"></i>
         ) : (
           <button className="btn btn-sm" onClick={handleOpenModal}>
-            <i className={`bi bi-trash pe-3 ${styles.icon}`}></i>
+            <i className={`bi bi-trash pe-2 ${styles.icon}`}></i>
           </button>
         )}
       </div>
