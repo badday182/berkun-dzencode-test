@@ -16,7 +16,7 @@ interface ModalWindowProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  id: string | number;
+  id: string | number | null;
   category: string;
 }
 
