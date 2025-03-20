@@ -60,7 +60,7 @@ const ModalWindow: React.FC<ModalWindowProps> = ({
       dispatch(deleteAllOrderProduct(Number(id)));
     }
     if (category === "product") {
-      dispatch(deleteProduct(id));
+      dispatch(deleteProduct(Number(id)));
     }
     onClose();
   };
