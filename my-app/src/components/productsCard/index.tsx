@@ -7,29 +7,12 @@ import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import ModalWindow from "../modalWindow";
-const defaultProduct: Product = {
-  id: 0,
-  serialNumber: 7777777777,
-  isNew: 1,
-  photo: "",
-  title: "Default Product",
-  type: "Default",
-  specification: "",
-  guarantee: {
-    start: new Date().toISOString(),
-    end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  price: [
-    { value: 0, symbol: "USD", isDefault: 0 },
-    { value: 0, symbol: "UAH", isDefault: 1 },
-  ],
-  order: 0,
-  date: new Date().toISOString(),
-};
 
-const ProductCard: React.FC<{ product?: Product }> = ({
-  product = defaultProduct,
-}) => {
+const ProductCard: React.FC<{ product?: Product }> = ({ product }) => {
+  if (!product) {
+    return <div className="card shadow-sm">No product data available</div>;
+  }
+
   const usdPrice = product.price.find((p) => p.symbol === "USD");
   const uahPrice = product.price.find((p) => p.symbol === "UAH");
 
@@ -59,20 +42,22 @@ const ProductCard: React.FC<{ product?: Product }> = ({
   return (
     <>
       <div className={`card shadow-sm flex-grow-1 ${styles.card}`}>
-        <div className="card-body d-flex justify-content-between align-items-center gap-5">
-          <div
-            className={`d-flex flex-grow-1 justify-content-between align-items-center gap-5`}
-          >
-            <div className="d-flex justify-content-between align-items-center gap-3 flex-grow-1">
-              <h5 className="card-title flex-grow-1 m-0">{product.title}</h5>
-              <span
-                className={`badge bg-secondary flex-shrink-0 ${styles.wordWrap}`}
-              >
-                {product.type}
-              </span>
-            </div>
+        <div className={clsx("card-body gap-5", styles.card__body)}>
+          <div className={clsx("gap-5", styles.card__content)}>
+            <h5 className={clsx("card-title", styles.card__title)}>
+              {product.title}
+            </h5>
+            <span
+              className={clsx(
+                "badge bg-secondary",
+                styles.card__type,
+                styles._wordWrap
+              )}
+            >
+              {product.type}
+            </span>
 
-            <div className="d-flex flex-column align-items-center flex-shrink-0">
+            <div className={styles.guarantee}>
               <div>
                 <span className="text-muted">с: </span>
                 <span className="text-muted">{guaranteeStartDate}</span>
@@ -83,20 +68,19 @@ const ProductCard: React.FC<{ product?: Product }> = ({
               </div>
             </div>
 
-            <div className="d-flex flex-column flex-shrink-0">
-              <div className="d-flex flex-column">
-                <div className="text-muted fs-6">{usdPrice?.value} USD</div>
-                <div className="text-muted fw-medium fs-5">
-                  {uahPrice?.value} UAH
-                </div>
+            <div className={styles.price}>
+              <div className="text-muted fs-6">{usdPrice?.value} USD</div>
+              <div className="text-muted fw-medium fs-5">
+                {uahPrice?.value} UAH
               </div>
             </div>
 
             <div
               className={clsx(
-                "text-muted d-flex flex-column flex-shrink-0",
-                styles.wordWrap,
-                styles.smallFontSize,
+                "text-muted",
+                styles.card__orderTitle,
+                styles._wordWrap,
+                styles._smallFontSize,
                 {
                   "d-none": isOpenAsideContainer && pathname === "/orders",
                 }
@@ -106,9 +90,9 @@ const ProductCard: React.FC<{ product?: Product }> = ({
             </div>
           </div>
 
-          <button className="btn btn-sm">
+          <button className={clsx("btn btn-sm", styles.deleteButton)}>
             <i
-              className={`bi bi-trash ${styles.icon}`}
+              className={`bi bi-trash ${styles.icon} ${styles.deleteButton__icon}`}
               onClick={handleOpenModal}
             ></i>
           </button>

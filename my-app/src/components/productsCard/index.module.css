@@ -1,15 +1,47 @@
 .card {
   transition: box-shadow 0.3s ease;
 }
-
-.wordWrap {
+.card__body,
+.card__content,
+.card__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card__content,
+.card__title {
+  flex-grow: 1;
+}
+.card__title {
+  margin: 0;
+}
+.card__type {
+  flex-shrink: 0;
+}
+._wordWrap {
   max-width: 125px;
-  white-space: pre-wrap; /* Учитывает пробелы и переносы строк */
-  word-wrap: break-word; /* Перенос длинных слов */
-  /* word-break: break-all;  */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.guarantee {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-.smallFontSize {
+.price {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.card__orderTitle {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+._smallFontSize {
   font-size: 12px;
 }
 
