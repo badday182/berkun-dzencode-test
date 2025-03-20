@@ -18,7 +18,7 @@
 
 Для реализации Lazy Loading был использован специальный компонент пустышка CardPlaceholder
 
-Для создания докер контейнера созданы и настроены Dockerfile и docker-compose.yml
+Для создания докер контейнера созданы и настроены Dockerfile и docker-compose.yml, команда на скачивание контейнера из докер хаба - docker pull badday182/nextjs-app
 
 ## Начало работы
 
