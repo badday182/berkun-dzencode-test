@@ -1,11 +1,11 @@
-FROM node:22.11.0-alpine 
+FROM node:22.11.0-alpine
 
-WORKDIR /my-app
+WORKDIR /app
 
-COPY ./my-app/package.json ./my-app/package-lock.json* ./
+COPY package.json package-lock.json* ./
 
-RUN npm install 
+RUN npm ci
 
-COPY ./my-app .
+COPY . .
 
 CMD ["npm", "run", "dev"]
