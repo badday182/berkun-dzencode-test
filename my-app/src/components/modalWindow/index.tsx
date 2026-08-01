@@ -1,6 +1,7 @@
+"use client";
+
 import React, { useEffect, useRef } from "react";
 import { useAppDispatch } from "@/lib/hooks";
-// import { deleteOrder } from "@/lib/features/orders/ordersSlice";
 
 import styles from "./index.module.css";
 import {
@@ -12,55 +13,62 @@ import {
   setSelectedOrderId,
   toggleAsideContainer,
 } from "@/lib/features/orders/ordersSlice";
-interface ModalWindowProps {
+import { assertNever, type OrderId, type ProductId } from "@/types";
+
+interface ModalWindowBaseProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  id: string | number | null;
-  category: string;
 }
 
-const ModalWindow: React.FC<ModalWindowProps> = ({
-  isOpen,
-  onClose,
-  title,
-  id,
-  category,
-}) => {
+/**
+ * Размеченное объединение: `category` определяет тип `id`.
+ * Передать `ProductId` вместе с `category: "order"` теперь не даст компилятор.
+ */
+export type ModalWindowProps = ModalWindowBaseProps &
+  ({ category: "order"; id: OrderId } | { category: "product"; id: ProductId });
+
+const ModalWindow: React.FC<ModalWindowProps> = (props) => {
+  const { isOpen, onClose, title, category } = props;
   const dispatch = useAppDispatch();
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
-    if (isOpen) {
-      // Focus the close button when modal opens
-      closeButtonRef.current?.focus();
+    if (!isOpen) return;
 
-      // Add event listener for ESC key
-      const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === "Escape") onClose();
-      };
+    // Focus the close button when modal opens
+    closeButtonRef.current?.focus();
 
-      document.addEventListener("keydown", handleEscape);
+    // Add event listener for ESC key
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
 
-      // Prevent scrolling on the body
-      document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleEscape);
 
-      return () => {
-        document.removeEventListener("keydown", handleEscape);
-        document.body.style.overflow = "";
-      };
-    }
+    // Prevent scrolling on the body
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "";
+    };
   }, [isOpen, onClose]);
 
   const handleDelete = () => {
-    if (category === "order") {
-      dispatch(deleteOrder(String(id)));
-      dispatch(toggleAsideContainer(false));
-      dispatch(setSelectedOrderId(null));
-      dispatch(deleteAllOrderProduct(Number(id)));
-    }
-    if (category === "product") {
-      dispatch(deleteProduct(Number(id)));
+    switch (props.category) {
+      case "order":
+        dispatch(deleteOrder(props.id));
+        dispatch(deleteAllOrderProduct(props.id));
+        dispatch(toggleAsideContainer(false));
+        dispatch(setSelectedOrderId(null));
+        break;
+      case "product":
+        dispatch(deleteProduct(props.id));
+        break;
+      default:
+        assertNever(props);
     }
     onClose();
   };
@@ -89,9 +97,10 @@ const ModalWindow: React.FC<ModalWindowProps> = ({
               />
             </div>
             <div className="modal-body">
+              {/* TODO(1.5): вынести в словари next-intl */}
               <p>
                 {category === "order"
-                  ? "Вы уверены, что хотите удалить этот заказ  и все его продукты?"
+                  ? "Вы уверены, что хотите удалить этот заказ и все его продукты?"
                   : "Вы уверены, что хотите удалить этот продукт?"}
               </p>
             </div>

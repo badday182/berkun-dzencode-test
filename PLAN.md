@@ -144,23 +144,64 @@ src/
 
 Цель: закрыть все прежние претензии ревьюера и получить предъявляемую версию.
 
-### Фаза 1.1 — TypeScript-чистка `0.5 дн`
+### Фаза 1.1 — TypeScript-чистка `0.5 дн` — ✅ сделано
 
 Закрывает: «типизация — интерфейсы, не более», остатки JS.
 
-- [ ] `components/select/index.js` → `index.tsx` с типизированными пропсами
-- [ ] `components/cardPlaceholder/index.js` → `index.tsx`
-- [ ] `base/app.js` вынести — станет сидом в репозитории API
-- [ ] `enum ProductType`, `enum Currency` вместо строковых литералов
-- [ ] Дженерики: `ApiResponse<T>`, `Paginated<T>`
-- [ ] DTO через утилити-типы: `CreateOrderDto = Omit<Order, 'id'>`
-- [ ] Дискриминированные юнионы для socket-событий (общий контракт с бэком)
-- [ ] Type guards: `isProduct`, `isApiError`
-- [ ] Branded types: `OrderId`, `ProductId` вместо голого `number`
-- [ ] Привести id к одному типу, убрать `String()` / `Number()` конвертации
-- [ ] Строгий режим TS: `strict`, `noUncheckedIndexedAccess`
-- [ ] ESLint + Prettier + husky + lint-staged
-- [ ] npm-скрипты: `dev`, `build`, `lint`, `typecheck`, `test`, `test:e2e`
+- [x] `components/select/index.js` → `index.tsx` с типизированными пропсами
+- [x] `components/cardPlaceholder/index.js` → `index.tsx`
+- [x] `base/app.js` вынесен в `src/mocks/seed.json` + `src/mocks/index.ts`
+- [x] `enum Currency`, `enum ProductCondition` вместо магических значений
+- [x] Дженерики: `ApiResponse<T>`, `Paginated<T>` (`types/api.ts`)
+- [x] DTO через утилити-типы: `CreateOrderDto = Omit<Order, "id">` и остальные
+- [x] Дискриминированные юнионы для socket-событий (`types/socket.ts`)
+- [x] Type guards: `isOrder`, `isProduct`, `isPrice`, `isCurrency`, `isApiError`
+- [x] Branded types: `OrderId`, `ProductId` вместо голого `number`
+- [x] Убраны все `String()` / `Number()` конвертации идентификаторов
+- [x] Строгий TS: `noUncheckedIndexedAccess`, `noImplicitOverride`,
+      `noFallthroughCasesInSwitch`, `forceConsistentCasingInFileNames`, `allowJs: false`
+- [x] ESLint (flat config) + Prettier + husky + lint-staged
+- [x] npm-скрипты: `lint`, `lint:fix`, `format`, `format:check`, `typecheck`, `verify`
+
+#### Отклонение от плана
+
+**`enum ProductType` не сделан намеренно.** В данных 11 категорий (`Мониторы`,
+`Периферия`, `Ноутбуки`, …), и это открытый каталог, который ведёт бэкенд.
+Enum пришлось бы править при каждой новой категории и он всё равно врал бы про
+данные с сервера. Оставлена `type ProductType = string` с константой
+`ALL_PRODUCT_TYPES` для фильтра. Глубина типизации добрана в других местах:
+branded types, мапленный тип `ServerToClientEvents`, размеченные объединения,
+утилити-типы DTO, `assertNever`.
+
+#### Попутно найдено и исправлено
+
+- **Нарушение правил хуков** в `productsCard`: ранний `return` при `product === undefined`
+  стоял выше `useState` и `useAppSelector` — при появлении продукта менялся порядок
+  хуков. Проп сделан обязательным, ранняя ветка убрана.
+- **`ModalWindow` мог получить `id === null`** из `orderProductsCard` — модалка
+  рендерилась вне проверки `selectedOrderId`. Добавлена защита.
+- **`onClick` висел на `<i>` внутри `<button>`** в `productsCard` и `orderProductsCard` —
+  клик по кнопке мимо иконки не срабатывал. Перенесён на `<button>`.
+- **Дублирование данных в моке:** у каждого заказа было вложенное поле `products`,
+  посимвольно совпадающее с плоским списком. Из сида убрано.
+- **Нестрогое сравнение** `selectedOrderId == orderId` в `orderCard` → `===`
+  (правило `eqeqeq` теперь ловит такое).
+
+#### Найдено, отложено осознанно
+
+- **`clsx("flex-grow-1", { orders: … })` в `orders/page.tsx`** подставляет литеральную
+  строку `orders`, а не хешированный класс CSS-модуля, поэтому `.orders { width: 30% }`
+  из `orders/index.module.css` никогда не применялся. Починка меняет раскладку —
+  разбирается в фазе 1.4 вместе с сайдбаром. В коде стоит `TODO(1.4)`.
+- **`deleteOrder` и `deleteAllOrderProduct` обязаны диспатчиться парой**, иначе
+  остаются продукты-сироты. Пока помечено комментарием; каскад делает API в фазе 1.2.
+- **Предупреждение `react-hooks/exhaustive-deps`** в `orders/page.tsx` — уходит
+  в фазе 1.3 вместе с заменой `useEffect` на `createAsyncThunk`.
+
+#### Проверка
+
+`npm run verify` (typecheck + lint + format:check) и `npm run build` проходят;
+остаётся одно известное предупреждение `exhaustive-deps`.
 
 ### Фаза 1.2 — минимальный API `1.5 дн`
 

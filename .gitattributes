@@ -1,0 +1,18 @@
+# Переводы строк — LF и в репозитории, и в рабочей копии.
+#
+# Git for Windows ставит core.autocrlf=true на уровне системы, из-за чего при
+# клоне файлы разворачиваются в CRLF. Prettier настроен на endOfLine: "lf",
+# и тогда `npm run format:check` падал бы на каждом файле сразу после клона.
+# `eol=lf` отменяет autocrlf для этого репозитория и снимает конфликт.
+#
+# Отдельно важно для .husky/*: хуки исполняются как shell-скрипты,
+# CRLF в них ломает запуск.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

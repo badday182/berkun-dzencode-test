@@ -1,3 +1,5 @@
+"use client";
+
 import {
   setSelectedOrderId,
   toggleAsideContainer,
@@ -28,8 +30,9 @@ const OrderProductsCard = () => {
   );
 
   const filteredProducts = products.filter(
-    (product) => String(product.order) === selectedOrderId
+    (product) => product.order === selectedOrderId
   );
+
   const closeModal = () => {
     dispatch(toggleAsideContainer(false));
     dispatch(setSelectedOrderId(null));
@@ -54,16 +57,13 @@ const OrderProductsCard = () => {
             )}
             onClick={closeModal}
           ></i>
-          {selectedOrderId && (
+          {selectedOrderId !== null && (
             <div>
               <div className="product-list gap-3 d-flex flex-column">
                 <div className="d-flex flex-row justify-content-between">
                   <h5 className="mb-3">{selectedOrderTitle}</h5>
-                  <button className="btn btn-sm">
-                    <i
-                      className={`bi bi-trash pe-2 ${styles.icon}`}
-                      onClick={handleOpenModal}
-                    ></i>
+                  <button className="btn btn-sm" onClick={handleOpenModal}>
+                    <i className={`bi bi-trash pe-2 ${styles.icon}`}></i>
                   </button>
                 </div>
                 {filteredProducts.length > 0 ? (
@@ -78,11 +78,11 @@ const OrderProductsCard = () => {
           )}
         </div>
       </div>
-      {showModal && (
+      {showModal && selectedOrderId !== null && (
         <ModalWindow
           isOpen={showModal}
           onClose={() => setShowModal(false)}
-          title={`Удалить заказ "${selectedOrderTitle}"?`}
+          title={`Удалить заказ "${selectedOrderTitle ?? ""}"?`}
           category="order"
           id={selectedOrderId}
         />

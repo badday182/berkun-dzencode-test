@@ -1,25 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  toggleAsideContainer,
-  setSelectedOrderId,
-  setSelectedOrderTitle,
-} from "@/lib/features/orders/ordersSlice";
 import { formatDate, formatDateShort } from "@/utils/formatDate";
 import getOrderStats from "@/utils/getOrderStats";
-import { ordersData, productsData } from "@/base/app";
+import { ordersData, productsData } from "@/mocks";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import OrderCard from "@/components/orderCard";
 import clsx from "clsx";
 
-import styles from "./index.module.css";
 import OrderProductsCard from "@/components/orderProductsCard";
 import {
   setOrders,
   setProducts,
 } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
 import CardPlaceholder from "@/components/cardPlaceholder";
+
+const PLACEHOLDER_COUNT = 8;
 
 const Orders = () => {
   const [loading, setLoading] = useState(true);
@@ -32,12 +28,9 @@ const Orders = () => {
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
   );
-  const selectedOrderId = useAppSelector(
-    (state) => state.orders.selectedOrderId
-  );
+
   useEffect(() => {
-    // In a real application need fetch data
-    // This is a demonstration
+    // TODO(1.3): заменить на createAsyncThunk + axios, добавить состояние ошибки
     const fetchData = async () => {
       try {
         // Simulating fetching the data
@@ -59,13 +52,15 @@ const Orders = () => {
     fetchData();
   }, [dispatch]);
 
-  // Create array of 8 placeholders
-  const placeholders = Array(8).fill(null);
+  const placeholders = Array.from({ length: PLACEHOLDER_COUNT });
 
   return (
     <div className="container">
       <h1 className="mb-4">Orders</h1>
       <div className="container mt-3 d-flex flex-row">
+        {/* TODO(1.4): класс `orders` — литеральная строка, а не класс CSS-модуля,
+            поэтому ширина 30% из index.module.css никогда не применялась.
+            Разбирается вместе с раскладкой при вводе сайдбара. */}
         <div className={clsx("flex-grow-1", { orders: isOpenAsideContainer })}>
           <div>
             {loading ? (
@@ -83,8 +78,7 @@ const Orders = () => {
                 return (
                   <div className="container mb-3" key={order.id}>
                     <OrderCard
-                      key={order.id}
-                      orderId={String(order.id)}
+                      orderId={order.id}
                       title={order.title}
                       productsCount={productsCount}
                       date={formatDate(order.date)}

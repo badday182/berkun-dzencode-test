@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/types";
+import { Currency, findPrice, type Product } from "@/types";
 import styles from "./index.module.css";
 import { useAppSelector } from "@/lib/hooks";
 import clsx from "clsx";
@@ -8,36 +8,35 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import ModalWindow from "../modalWindow";
 
-const ProductCard: React.FC<{ product?: Product }> = ({ product }) => {
-  if (!product) {
-    return <div className="card shadow-sm">No product data available</div>;
-  }
+interface ProductCardProps {
+  product: Product;
+}
 
-  const usdPrice = product.price.find((p) => p.symbol === "USD");
-  const uahPrice = product.price.find((p) => p.symbol === "UAH");
-
-  // Format the dates for display
-  const guaranteeStartDate = new Date(
-    product.guarantee.start
-  ).toLocaleDateString();
-  const guaranteeEndDate = new Date(product.guarantee.end).toLocaleDateString();
-  // const receiptDate = new Date(product.date).toLocaleDateString();
-
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [showModal, setShowModal] = useState(false);
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
 
   const orders = useAppSelector((state) => state.ordersAndProductsData.orders);
-
-  const orderTitle =
-    orders.find((order) => order.id === product.order)?.title ||
-    "Default Order";
-
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
   );
   const pathname = usePathname();
+
+  const usdPrice = findPrice(product.price, Currency.USD);
+  const uahPrice = findPrice(product.price, Currency.UAH);
+
+  // TODO(2.1): форматировать в UTC, иначе SSR даст hydration mismatch
+  const guaranteeStartDate = new Date(
+    product.guarantee.start
+  ).toLocaleDateString();
+  const guaranteeEndDate = new Date(product.guarantee.end).toLocaleDateString();
+
+  const orderTitle =
+    orders.find((order) => order.id === product.order)?.title ??
+    "Default Order";
+
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
 
   return (
     <>
@@ -90,10 +89,12 @@ const ProductCard: React.FC<{ product?: Product }> = ({ product }) => {
             </div>
           </div>
 
-          <button className={clsx("btn btn-sm", styles.deleteButton)}>
+          <button
+            className={clsx("btn btn-sm", styles.deleteButton)}
+            onClick={handleOpenModal}
+          >
             <i
               className={`bi bi-trash ${styles.icon} ${styles.deleteButton__icon}`}
-              onClick={handleOpenModal}
             ></i>
           </button>
         </div>

@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import type { OrderId } from "@/types";
 
 export interface OrdersState {
   isOpenAsideContainer: boolean;
-  selectedOrderId: string | null;
+  selectedOrderId: OrderId | null;
   selectedOrderTitle: string | null;
 }
 
@@ -20,7 +21,7 @@ export const ordersSlice = createSlice({
     toggleAsideContainer: (state, action: PayloadAction<boolean>) => {
       state.isOpenAsideContainer = action.payload;
     },
-    setSelectedOrderId: (state, action: PayloadAction<string | null>) => {
+    setSelectedOrderId: (state, action: PayloadAction<OrderId | null>) => {
       state.selectedOrderId = action.payload;
     },
     setSelectedOrderTitle: (state, action: PayloadAction<string | null>) => {

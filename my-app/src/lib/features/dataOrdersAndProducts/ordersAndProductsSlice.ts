@@ -1,13 +1,13 @@
-import { Order, Product } from "@/types";
+import type { Order, OrderId, Product, ProductId } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export interface ordersAndProducts {
+export interface OrdersAndProductsState {
   orders: Order[];
   products: Product[];
 }
 
-const initialState: ordersAndProducts = {
+const initialState: OrdersAndProductsState = {
   orders: [],
   products: [],
 };
@@ -19,12 +19,13 @@ export const ordersAndProductsSlice = createSlice({
     setOrders: (state, action: PayloadAction<Order[]>) => {
       state.orders = action.payload;
     },
-    deleteOrder: (state, action: PayloadAction<string>) => {
+    deleteOrder: (state, action: PayloadAction<OrderId>) => {
       state.orders = state.orders.filter(
-        (order) => order.id !== Number(action.payload)
+        (order) => order.id !== action.payload
       );
     },
-    deleteAllOrderProduct: (state, action: PayloadAction<number>) => {
+    /** Всегда диспатчится в паре с `deleteOrder`, иначе продукты останутся сиротами. */
+    deleteAllOrderProduct: (state, action: PayloadAction<OrderId>) => {
       state.products = state.products.filter(
         (product) => product.order !== action.payload
       );
@@ -32,7 +33,7 @@ export const ordersAndProductsSlice = createSlice({
     setProducts: (state, action: PayloadAction<Product[]>) => {
       state.products = action.payload;
     },
-    deleteProduct: (state, action: PayloadAction<number>) => {
+    deleteProduct: (state, action: PayloadAction<ProductId>) => {
       state.products = state.products.filter(
         (product) => product.id !== action.payload
       );

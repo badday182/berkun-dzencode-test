@@ -6,29 +6,34 @@ import {
   setProducts,
 } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { useEffect, useState } from "react";
-import { ordersData, productsData } from "@/base/app";
-import SelectCustom from "@/components/select";
+import { useEffect, useMemo, useState } from "react";
+import { ordersData, productsData } from "@/mocks";
+import SelectCustom, { type ProductTypeFilter } from "@/components/select";
 import CardPlaceholder from "@/components/cardPlaceholder";
+import { ALL_PRODUCT_TYPES } from "@/types";
+
+const PLACEHOLDER_COUNT = 8;
 
 const Products = () => {
   const [loading, setLoading] = useState(true);
-  const [selectedType, setSelectedType] = useState("all");
+  const [selectedType, setSelectedType] =
+    useState<ProductTypeFilter>(ALL_PRODUCT_TYPES);
   const orders = useAppSelector((state) => state.ordersAndProductsData.orders);
   const products = useAppSelector(
     (state) => state.ordersAndProductsData.products
   );
 
-  // Filter products by selected type
-  const filteredProducts =
-    selectedType === "all"
-      ? products
-      : products?.filter((product) => product.type === selectedType);
+  const filteredProducts = useMemo(
+    () =>
+      selectedType === ALL_PRODUCT_TYPES
+        ? products
+        : products.filter((product) => product.type === selectedType),
+    [products, selectedType]
+  );
 
   const dispatch = useAppDispatch();
   useEffect(() => {
-    // In a real application need fetch data
-    // This is a demonstration
+    // TODO(1.3): заменить на createAsyncThunk + axios, добавить состояние ошибки
     const fetchData = async () => {
       try {
         // Simulating fetching the data
@@ -50,12 +55,11 @@ const Products = () => {
     fetchData();
   }, [dispatch, orders, products]);
 
-  const handleTypeChange = (type: string) => {
+  const handleTypeChange = (type: ProductTypeFilter) => {
     setSelectedType(type);
   };
 
-  // Create array of 8 placeholders
-  const placeholders = Array(8).fill(null);
+  const placeholders = Array.from({ length: PLACEHOLDER_COUNT });
 
   return (
     <div className="container">
@@ -69,7 +73,7 @@ const Products = () => {
         </div>
       ) : (
         <div className="container mt-3 d-flex flex-column gap-3">
-          {filteredProducts && filteredProducts.length > 0 ? (
+          {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <ProductsCard key={product.id} product={product} />
             ))
