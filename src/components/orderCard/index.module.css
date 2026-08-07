@@ -1,19 +1,22 @@
+/* Единые для карточек величины: скругление, отступ, тень при наведении. */
 .card {
-  transition: box-shadow 0.3s ease;
+  border-radius: 0.75rem;
+  transition: box-shadow 0.15s ease-in-out;
 }
 
 .card:hover {
-  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 12%);
 }
 
 .cardContent {
   cursor: pointer;
+  padding: 1rem 1.25rem;
 }
 
 .icon {
-  transition: box-shadow 0.3s ease;
+  transition: color 0.15s ease-in-out;
 }
+
 .icon:hover {
-  color: red;
+  color: var(--bs-danger, #dc3545);
 }

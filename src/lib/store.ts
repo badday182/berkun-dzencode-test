@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import ordersReducer from "./features/orders/ordersSlice";
 import ordersAndProductsReducer from "./features/dataOrdersAndProducts/ordersAndProductsSlice";
 import sessionReducer from "./features/session/sessionSlice";
+import layoutReducer from "./features/layout/layoutSlice";
 import { listenerMiddleware } from "./listenerMiddleware";
 
 /**
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   orders: ordersReducer,
   ordersAndProductsData: ordersAndProductsReducer,
   session: sessionReducer,
+  layout: layoutReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

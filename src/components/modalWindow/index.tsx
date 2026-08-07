@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { useAppDispatch } from "@/lib/hooks";
-
-import styles from "./index.module.css";
+import Modal from "../modal";
 import {
   removeOrder,
   removeProduct,
@@ -27,33 +26,10 @@ interface ModalWindowBaseProps {
 export type ModalWindowProps = ModalWindowBaseProps &
   ({ category: "order"; id: OrderId } | { category: "product"; id: ProductId });
 
+/** Подтверждение удаления. Разметку окна рисует общая оболочка `Modal`. */
 const ModalWindow: React.FC<ModalWindowProps> = (props) => {
   const { isOpen, onClose, title, category } = props;
   const dispatch = useAppDispatch();
-  const modalRef = useRef<HTMLDivElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    // Focus the close button when modal opens
-    closeButtonRef.current?.focus();
-
-    // Add event listener for ESC key
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-
-    document.addEventListener("keydown", handleEscape);
-
-    // Prevent scrolling on the body
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, onClose]);
 
   const handleDelete = () => {
     // Удаление ушло на сервер: thunk сначала дожидается `204`, и только потом
@@ -74,57 +50,34 @@ const ModalWindow: React.FC<ModalWindowProps> = (props) => {
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className={`modal-backdrop ${styles.modalBackdrop}`} onClick={onClose}>
-      <div
-        className="modal fade show d-block"
-        role="dialog"
-        aria-modal="true"
-        ref={modalRef}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">{title}</h5>
-              <button
-                ref={closeButtonRef}
-                type="button"
-                className="btn-close"
-                onClick={onClose}
-                aria-label="Close"
-              />
-            </div>
-            <div className="modal-body">
-              {/* TODO(1.5): вынести в словари next-intl */}
-              <p>
-                {category === "order"
-                  ? "Вы уверены, что хотите удалить этот заказ и все его продукты?"
-                  : "Вы уверены, что хотите удалить этот продукт?"}
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={onClose}
-              >
-                Отмена
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={handleDelete}
-              >
-                Удалить
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      footer={
+        <>
+          {/* TODO(1.5): вынести в словари next-intl */}
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
+            Отмена
+          </button>
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={handleDelete}
+          >
+            Удалить
+          </button>
+        </>
+      }
+    >
+      {/* TODO(1.5): вынести в словари next-intl */}
+      <p className="mb-0">
+        {category === "order"
+          ? "Вы уверены, что хотите удалить этот приход и все его продукты?"
+          : "Вы уверены, что хотите удалить этот продукт?"}
+      </p>
+    </Modal>
   );
 };
 

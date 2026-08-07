@@ -112,6 +112,13 @@ export class HttpError extends Error implements ApiError {
   static from(cause: unknown): HttpError {
     if (cause instanceof HttpError) return cause;
 
+    // `unwrap()` у thunk'а бросает не `Error`, а сам payload — то есть уже
+    // разобранный `ApiError`, который сюда же и клали. Без этой ветки форма
+    // показывала бы `String(объект)`, то есть «[object Object]».
+    if (isApiError(cause)) {
+      return new HttpError(cause.statusCode, cause.message, cause.error);
+    }
+
     if (cause instanceof AxiosError) {
       const { response } = cause;
       if (response === undefined) {

@@ -1,0 +1,33 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 75rem;
+  margin: 0 auto;
+}
+
+.page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.page__subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--bs-secondary-color, #6c757d);
+  font-size: 0.875rem;
+}
+
+/* Фильтр не должен растягиваться на всю ширину экрана — читать такой список
+   значений неудобно. */
+.filter {
+  max-width: 22rem;
+}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import NavigationMenu from "@/components/navigationMenu";
+import AppShell from "@/components/layout/appShell";
 import StoreProvider from "./StoreProvider";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -30,11 +30,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {/* Шапка внутри провайдера: счётчик сессий в ней читает стор, а до
-            этого она рендерилась выше и контекста Redux не видела. */}
+        {/* Каркас внутри провайдера: и сайдбар, и шапка читают стор. */}
         <StoreProvider>
-          <NavigationMenu />
-          {children}
+          <AppShell>{children}</AppShell>
         </StoreProvider>
       </body>
     </html>

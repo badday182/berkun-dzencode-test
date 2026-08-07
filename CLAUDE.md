@@ -43,16 +43,17 @@ Code contains `TODO(<phase>)` markers such as `TODO(1.5)` or `TODO(2.1)` that
 point at the phase in `PLAN.md` where that item is scheduled. Leave them in
 place unless you are actually doing that phase.
 
-Phases 1.1 and 1.2 are complete. 1.2 built the API in the sibling repository
-`../berkun-dzencode-api` (NestJS, :4000) — REST for orders/products with cascade
-delete, a socket.io gateway with a session counter, domain events, CORS,
-`ValidationPipe`, Docker.
+Phase 1.2 built the API in the sibling repository `../berkun-dzencode-api`
+(NestJS, :4000) — REST for orders/products with cascade delete, a socket.io
+gateway with a session counter, domain events, CORS, `ValidationPipe`, Docker.
 
-Phases 1.1–1.3 are complete: the app talks to the API over HTTP, holds a
-socket.io connection, loads through thunks, and has `not-found` / `error` /
-`loading` routes. Still absent by design, not by oversight: i18n, forms, the left
-sidebar, SSR of data, auth, tests. `src/types/socket.ts` is the shared event
-contract — the API mirrors it in `src/domain/events.ts`; change both or neither.
+Block 1 is complete except i18n: the app talks to the API over HTTP, holds a
+socket.io connection, loads through thunks, has `not-found` / `error` / `loading`
+routes, a collapsible sidebar and Formik forms. Still absent by design, not by
+oversight: i18n (phase 1.5 — every user-facing string carries a `TODO(1.5)`),
+editing (no `PATCH` on the API), SSR of data, auth, tests.
+`src/types/socket.ts` is the shared event contract — the API mirrors it in
+`src/domain/events.ts`; change both or neither.
 
 ## Architecture
 
@@ -96,26 +97,51 @@ nothing is server-rendered from data yet** — this is the phase 2.1 rework;
 `StoreProvider` already accepts `preloadedState`, and `makeStore` merges it over
 the slices' `initialState`.
 
+### Layout and components
+
+`app/layout.tsx` renders `StoreProvider` → `components/layout/appShell`, which
+owns the frame: `layout/sidebar` on the left, `layout/topbar` above the page,
+`{children}` under it. The shell is a client component because the mobile
+backdrop needs state; pages stay independent of it. Sidebar state lives in the
+`layout` slice — two separate flags, `isSidebarCollapsed` (desktop, shrinks to
+icons) and `isMobileSidebarOpen` (narrow screens, slides over the content).
+
+`components/modal` is the window itself — backdrop, Escape, scroll lock, focus,
+optional footer. `components/modalWindow` is the delete confirmation built on
+top of it, and the forms open in the same shell. Forms live in
+`components/forms/` (Formik + Yup) and are pulled in with `next/dynamic` from
+the `addOrderButton` / `addProductButton` wrappers — Formik and Yup should not
+land in the initial bundle for someone who never opens a form.
+
+Conditional CSS-module classes must be written `clsx(base, cond && styles.x)`,
+not `clsx(base, { [styles.x]: cond })` — under `noUncheckedIndexedAccess` a
+module class is `string | undefined` and cannot be a computed key.
+
 `src/mocks/` is no longer wired to anything — it survives as fixtures for the
 MSW/Vitest work in phase 2.6. Do not reconnect pages to it.
 
 ### Redux store (`src/lib/`)
 
-Two slices with a deliberate split:
+Four slices with a deliberate split:
 
 - `features/dataOrdersAndProducts/ordersAndProductsSlice.ts` — the domain data
   (orders, products), their request status/error, the `fetchOrders` /
-  `fetchProducts` / `removeOrder` / `removeProduct` thunks and the local
-  deletion reducers.
+  `fetchProducts` / `addOrder` / `addProduct` / `removeOrder` / `removeProduct`
+  thunks and the local deletion reducers.
 - `features/orders/ordersSlice.ts` — **UI selection state only**: which order is
   selected, its title, whether the side panel is open.
 - `features/session/sessionSlice.ts` — the socket connection: how many sessions
   are active and whether we are connected. `socketConnectionStarted` /
   `socketConnectionStopped` are commands for the listener middleware, not state
   changes; `StoreProvider` dispatches them on mount/unmount.
+- `features/layout/layoutSlice.ts` — sidebar collapse and the mobile drawer.
 
 Use the typed hooks from `src/lib/hooks.ts` (`useAppDispatch`, `useAppSelector`),
 never the raw react-redux ones.
+
+Forms `await dispatch(addOrder(dto)).unwrap()` so the modal only closes once the
+server answered; the rejection it throws is the `ApiError` payload, which
+`toApiError` turns back into a message.
 
 Delete through the `removeOrder` / `removeProduct` thunks, not the plain
 reducers — the thunk waits for the server's `204` before touching the store, so
@@ -158,9 +184,14 @@ them:
 
 Bootstrap 5 + bootstrap-icons, imported globally in `app/layout.tsx`, plus
 per-component CSS modules (`index.module.css` next to each component) and `clsx`
-for conditional classes. Watch for the CSS-module trap: `clsx("x", { orders: … })`
-emits the literal class `orders`, not the hashed module class — that bug exists
-today in `app/orders/page.tsx` and is marked `TODO(1.4)`.
+for conditional classes. Sizes in `rem`, colours through Bootstrap's CSS
+variables (`var(--bs-danger, #dc3545)`) so a theme swap stays possible.
+
+Two traps, both of which bit this codebase already: `clsx("x", { orders: … })`
+emits the literal class `orders` rather than the hashed one (fixed in phase 1.4,
+after the rule had silently done nothing since 1.1), and CSS values must not be
+quoted — `position: "fixed"` is invalid and the browser drops the whole
+declaration.
 
 ## Conventions and constraints
 

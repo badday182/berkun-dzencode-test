@@ -1,5 +1,7 @@
 import type {
   ApiError,
+  CreateOrderDto,
+  CreateProductDto,
   Order,
   OrderId,
   Product,
@@ -91,6 +93,36 @@ export const fetchProducts = createAppAsyncThunk(
 );
 
 /**
+ * Создание прихода и продукта.
+ *
+ * Форма ждёт результат: `unwrap()` на стороне компонента превращает ветку
+ * `rejected` в исключение, и Formik показывает серверную ошибку под кнопкой,
+ * не закрывая окно. Поэтому ошибка сюда же и возвращается через
+ * `rejectWithValue`, а не только оседает в сторе.
+ */
+export const addOrder = createAppAsyncThunk(
+  "ordersAndProductsData/addOrder",
+  async (dto: CreateOrderDto, { rejectWithValue }) => {
+    try {
+      return await api.createOrder(dto);
+    } catch (cause) {
+      return rejectWithValue(api.toApiError(cause));
+    }
+  }
+);
+
+export const addProduct = createAppAsyncThunk(
+  "ordersAndProductsData/addProduct",
+  async (dto: CreateProductDto, { rejectWithValue }) => {
+    try {
+      return await api.createProduct(dto);
+    } catch (cause) {
+      return rejectWithValue(api.toApiError(cause));
+    }
+  }
+);
+
+/**
  * Удаление прихода: сначала сервер, потом стор.
  *
  * Локальные редьюсеры `deleteOrder` / `deleteAllOrderProduct` остались — их
@@ -178,6 +210,14 @@ export const ordersAndProductsSlice = createSlice({
         state.productsStatus = "failed";
         state.productsError =
           action.payload ?? unknownError(action.error.message);
+      })
+      .addCase(addOrder.fulfilled, (state, action) => {
+        // Сервер не рассылает событий на создание, поэтому в чужих вкладках
+        // приход появится только после перезагрузки — см. отложенное в плане.
+        state.orders.push(action.payload);
+      })
+      .addCase(addProduct.fulfilled, (state, action) => {
+        state.products.push(action.payload);
       })
       .addCase(removeOrder.fulfilled, (state, action) => {
         // Каскад: сервер удалил продукты прихода и отдельных событий по ним

@@ -1,6 +1,12 @@
 .card {
-  transition: box-shadow 0.3s ease;
+  border-radius: 0.75rem;
+  transition: box-shadow 0.15s ease-in-out;
 }
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 12%);
+}
+
 .card__body,
 .card__content,
 .card__title {
@@ -8,21 +14,33 @@
   justify-content: space-between;
   align-items: center;
 }
+
+.card__body {
+  padding: 1rem 1.25rem;
+}
+
 .card__content,
 .card__title {
   flex-grow: 1;
 }
+
 .card__title {
   margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
 }
+
 .card__type {
   flex-shrink: 0;
 }
+
 ._wordWrap {
-  max-width: 125px;
+  /* В rem, а не в пикселях: остальные размеры карточек тоже в rem. */
+  max-width: 7.75rem;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
 .guarantee {
   display: flex;
   flex-direction: column;
@@ -41,22 +59,35 @@
   flex-direction: column;
   flex-shrink: 0;
 }
+
 ._smallFontSize {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
-.card:hover {
-  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+.deleteButton {
+  flex-shrink: 0;
 }
 
-.cardContent {
-  cursor: pointer;
-}
-
+.deleteButton__icon,
 .icon {
-  transition: box-shadow 0.3s ease;
+  transition: color 0.15s ease-in-out;
 }
+
+.deleteButton:hover .deleteButton__icon,
 .icon:hover {
-  color: red;
+  color: var(--bs-danger, #dc3545);
+}
+
+/* На узком экране карточка перестаёт быть строкой: иначе шесть колонок
+   сжимаются до нечитаемого. */
+@media (max-width: 767.98px) {
+  .card__content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem !important;
+  }
+
+  ._wordWrap {
+    max-width: none;
+  }
 }

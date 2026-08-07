@@ -1,0 +1,58 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 75rem;
+  margin: 0 auto;
+}
+
+.page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.page__subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--bs-secondary-color, #6c757d);
+  font-size: 0.875rem;
+}
+
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.list {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/*
+ * Открытая боковая панель поджимает список — ровно то, чего добивался
+ * `.orders { width: 30% }` из старого `app/orders/index.module.css`, который
+ * никогда не применялся: класс подставлялся строкой, а не через модуль.
+ */
+.list_narrow {
+  flex: 0 1 45%;
+}
+
+@media (max-width: 991.98px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .list_narrow {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}

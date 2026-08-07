@@ -6,6 +6,8 @@ import { useOrders, useProducts } from "@/hooks";
 import OrderCard from "../orderCard";
 import OrderProductsCard from "../orderProductsCard";
 import CardPlaceholder from "../cardPlaceholder";
+import AddOrderButton from "../forms/addOrderButton";
+import styles from "./index.module.css";
 
 const PLACEHOLDER_COUNT = 8;
 
@@ -46,44 +48,64 @@ const OrdersView = () => {
   const placeholders = Array.from({ length: PLACEHOLDER_COUNT });
 
   return (
-    <div className="container">
-      <h1 className="mb-4">Orders</h1>
+    <div className={styles.page}>
+      <div className={styles.page__header}>
+        {/* TODO(1.5): вынести в словари next-intl */}
+        <div>
+          <h1 className={styles.page__title}>Приходы</h1>
+          <p className={styles.page__subtitle}>
+            {isLoading ? "Загрузка…" : `Всего: ${orders.length}`}
+          </p>
+        </div>
+        <AddOrderButton />
+      </div>
+
       {error && (
         <div
-          className="alert alert-danger d-flex align-items-center justify-content-between"
+          className="alert alert-danger d-flex align-items-center justify-content-between gap-3"
           role="alert"
         >
           {/* TODO(1.5): вынести в словари next-intl */}
           <span>Не удалось загрузить данные: {error.message}</span>
           <button
             type="button"
-            className="btn btn-sm btn-outline-danger"
+            className="btn btn-sm btn-outline-danger flex-shrink-0"
             onClick={retry}
           >
             Повторить
           </button>
         </div>
       )}
-      <div className="container mt-3 d-flex flex-row">
-        {/* TODO(1.4): класс `orders` — литеральная строка, а не класс CSS-модуля,
-            поэтому ширина 30% из `app/orders/index.module.css` никогда не
-            применялась. Разбирается вместе с раскладкой при вводе сайдбара. */}
-        <div className={clsx("flex-grow-1", { orders: isOpenAsideContainer })}>
-          <div>
-            {isLoading ? (
-              <div className="container mt-3 d-flex flex-column gap-3">
-                {placeholders.map((_, index) => (
-                  <CardPlaceholder key={`placeholder-${index}`} />
-                ))}
-              </div>
-            ) : (
-              orders.map((order) => (
-                <div className="container mb-3" key={order.id}>
-                  <OrderCard order={order} />
-                </div>
-              ))
-            )}
-          </div>
+
+      <div className={styles.layout}>
+        {/* Класс модуля добавляется условием: `{ [styles.x]: cond }` под
+            `noUncheckedIndexedAccess` невозможен, а строковый литерал `orders`
+            (как было до фазы 1.4) просто не соответствовал хешированному
+            классу — из-за этого ширина колонки никогда не применялась. */}
+        <div
+          className={clsx(
+            styles.list,
+            isOpenAsideContainer && styles.list_narrow
+          )}
+        >
+          {isLoading ? (
+            <div className="d-flex flex-column gap-3">
+              {placeholders.map((_, index) => (
+                <CardPlaceholder key={`placeholder-${index}`} />
+              ))}
+            </div>
+          ) : orders.length > 0 ? (
+            <div className="d-flex flex-column gap-3">
+              {orders.map((order) => (
+                <OrderCard key={order.id} order={order} />
+              ))}
+            </div>
+          ) : (
+            // TODO(1.5): вынести в словари next-intl
+            <div className="alert alert-info mb-0">
+              Приходов пока нет. Добавьте первый.
+            </div>
+          )}
         </div>
 
         <OrderProductsCard />
