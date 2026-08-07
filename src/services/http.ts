@@ -19,6 +19,20 @@ import { isApiError, type ApiError } from "@/types";
 /** Адрес API по умолчанию — порт из `berkun-dzencode-api`. */
 const DEFAULT_API_URL = "http://localhost:4000";
 
+/**
+ * То, что вызывающий код вправе донастроить у отдельного запроса.
+ *
+ * Намеренно уже, чем `AxiosRequestConfig`: методы из `services/api` не должны
+ * позволять переопределять `baseURL` или `withCredentials` — иначе настройки
+ * транспорта расползутся по компонентам. `signal` приходит из
+ * `createAsyncThunk`, `headers` понадобятся в фазе 2.1, чтобы прокинуть
+ * `Cookie` в серверный запрос.
+ */
+export interface RequestOptions {
+  signal?: AbortSignal;
+  headers?: Record<string, string>;
+}
+
 /** Ответ не пришёл вовсе: обрыв сети, таймаут, отказ CORS. */
 export const NETWORK_ERROR_STATUS = 0;
 
