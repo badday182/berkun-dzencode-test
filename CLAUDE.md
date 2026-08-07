@@ -48,10 +48,11 @@ Phases 1.1 and 1.2 are complete. 1.2 built the API in the sibling repository
 delete, a socket.io gateway with a session counter, domain events, CORS,
 `ValidationPipe`, Docker.
 
-Phase 1.3 is in progress: the app now talks to the API over HTTP. Still absent
-by design, not by oversight: socket connections, i18n, forms, SSR of data, auth,
-tests. `src/types/socket.ts` is the shared event contract — the API mirrors it in
-`src/domain/events.ts`; change both or neither.
+Phase 1.3 is in progress: the app talks to the API over HTTP and holds a
+socket.io connection. Still absent by design, not by oversight: custom hooks,
+404/error routes, i18n, forms, SSR of data, auth, tests. `src/types/socket.ts` is
+the shared event contract — the API mirrors it in `src/domain/events.ts`; change
+both or neither.
 
 ## Architecture
 
@@ -67,6 +68,14 @@ Import request functions from `@/services/api`, never `@/services/http` directly
 same six functions. Everything under `src/services/` is isomorphic: no `window`,
 no React, no Redux, so phase 2.1 can call it from Server Components. Per-request
 tweaks go through the narrow `RequestOptions` (`signal`, `headers`).
+
+Server-pushed changes take a second path: `src/services/socket.ts` (socket.io
+client, reconnection, payloads validated before they leave the module) →
+`src/lib/listenerMiddleware.ts` → plain reducers. Components never subscribe to
+the socket; they read the resulting state. A deletion made in another tab lands
+in the store through the same reducers as a local one, so `deleteOrder` /
+`deleteAllOrderProduct` / `deleteProduct` now have two callers each — the delete
+thunks and the socket listener.
 
 Both pages (`app/orders/page.tsx`, `app/products/page.tsx`) are `"use client"`
 and dispatch the fetch thunks from `useEffect`. **The App Router is in use but
@@ -87,6 +96,10 @@ Two slices with a deliberate split:
   deletion reducers.
 - `features/orders/ordersSlice.ts` — **UI selection state only**: which order is
   selected, its title, whether the side panel is open.
+- `features/session/sessionSlice.ts` — the socket connection: how many sessions
+  are active and whether we are connected. `socketConnectionStarted` /
+  `socketConnectionStopped` are commands for the listener middleware, not state
+  changes; `StoreProvider` dispatches them on mount/unmount.
 
 Use the typed hooks from `src/lib/hooks.ts` (`useAppDispatch`, `useAppSelector`),
 never the raw react-redux ones.
@@ -148,9 +161,10 @@ today in `app/orders/page.tsx` and is marked `TODO(1.4)`.
   v16. Do not bump one without the other.
 - **Prettier uses `endOfLine: "lf"`** and `.gitattributes` sets `* text=auto eol=lf`
   to override the system-level `core.autocrlf=true` from Git for Windows.
-- `socket.io-client` is installed but nothing imports it yet — the connection
-  lands in phase 1.3. The server-side `socket.io` package was removed from this
-  repository in phase 1.2; it lives in the API now. Do not add it back here.
+- The socket connection is opened lazily and only in the browser: `getSocket()`
+  returns `null` when `window` is undefined, so importing `services/socket` from
+  server-rendered code is safe. The server-side `socket.io` package was removed
+  from this repository in phase 1.2; it lives in the API now. Do not add it back.
 - `npm audit` reports pre-existing vulnerabilities, including a critical one in
   `next@15.2.2`. Upgrading is a deliberate, unmade decision — do not "fix" it
   incidentally.

@@ -1,6 +1,8 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import ordersReducer from "./features/orders/ordersSlice";
 import ordersAndProductsReducer from "./features/dataOrdersAndProducts/ordersAndProductsSlice";
+import sessionReducer from "./features/session/sessionSlice";
+import { listenerMiddleware } from "./listenerMiddleware";
 
 /**
  * Корневой редьюсер объявлен отдельно от стора намеренно: `RootState` выводится
@@ -11,6 +13,7 @@ import ordersAndProductsReducer from "./features/dataOrdersAndProducts/ordersAnd
 const rootReducer = combineReducers({
   orders: ordersReducer,
   ordersAndProductsData: ordersAndProductsReducer,
+  session: sessionReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
@@ -25,6 +28,10 @@ export const makeStore = (preloadedState?: Partial<RootState>) =>
   configureStore({
     reducer: rootReducer,
     preloadedState,
+    // `prepend`, а не `concat`: слушатель должен увидеть экшен раньше, чем
+    // тот дойдёт до редьюсеров и остальных middleware.
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().prepend(listenerMiddleware.middleware),
   });
 
 export type AppStore = ReturnType<typeof makeStore>;

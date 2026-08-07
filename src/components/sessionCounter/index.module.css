@@ -1,0 +1,18 @@
+.counter {
+  /* Ширина фиксирована: число меняется на лету, и без этого соседние часы
+     дёргались бы при переходе с 9 на 10. */
+  min-width: 7.5rem;
+  justify-content: flex-end;
+}
+
+.indicator {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--bs-secondary-color, #6c757d);
+  flex-shrink: 0;
+}
+
+.indicator_online {
+  background-color: var(--bs-success, #198754);
+}

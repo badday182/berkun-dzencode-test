@@ -30,8 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <NavigationMenu />
-        <StoreProvider>{children}</StoreProvider>
+        {/* Шапка внутри провайдера: счётчик сессий в ней читает стор, а до
+            этого она рендерилась выше и контекста Redux не видела. */}
+        <StoreProvider>
+          <NavigationMenu />
+          {children}
+        </StoreProvider>
       </body>
     </html>
   );

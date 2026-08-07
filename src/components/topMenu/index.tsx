@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import SessionCounter from "../sessionCounter";
 
 const TopMenu = () => {
   const [currentDateTime, setCurrentDateTime] = useState<Date>(new Date());
@@ -24,9 +25,12 @@ const TopMenu = () => {
 
   return (
     <div className="container-fluid">
-      <div className="ms-auto d-flex flex-column align-items-end">
-        <div className="text-muted small">{formattedDate}</div>
-        <div className="fw-bold">{formattedTime}</div>
+      <div className="ms-auto d-flex align-items-center gap-3">
+        <SessionCounter />
+        <div className="d-flex flex-column align-items-end">
+          <div className="text-muted small">{formattedDate}</div>
+          <div className="fw-bold">{formattedTime}</div>
+        </div>
       </div>
     </div>
   );
