@@ -22,6 +22,11 @@ npm run verify       # typecheck + lint + format:check — run this before finis
 `.next` live in named volumes so the Linux build is not clobbered by the mounted
 Windows host directory.
 
+`docker compose -f docker-compose.full.yml up` brings up **both** halves — this
+app plus the API from the sibling directory `../berkun-dzencode-api`. The two
+files are kept separate on purpose: the plain `docker-compose.yml` must keep
+working for someone who cloned only this repository.
+
 **There is no test suite yet.** Vitest + RTL + MSW + Playwright are planned in
 phase 2.6 of `PLAN.md`. Do not invent test commands; if asked to run tests, say
 none exist.
@@ -38,8 +43,15 @@ Code contains `TODO(<phase>)` markers such as `TODO(1.5)` or `TODO(2.1)` that
 point at the phase in `PLAN.md` where that item is scheduled. Leave them in
 place unless you are actually doing that phase.
 
-Only phase 1.1 is complete. Notably absent by design, not by oversight: axios,
-any real HTTP layer, socket connections, i18n, forms, SSR of data, auth, tests.
+Phases 1.1 and 1.2 are complete. 1.2 built the API in the sibling repository
+`../berkun-dzencode-api` (NestJS, :4000) — REST for orders/products with cascade
+delete, a socket.io gateway with a session counter, domain events, CORS,
+`ValidationPipe`, Docker.
+
+**This repository still does not talk to it.** Notably absent by design, not by
+oversight: axios, any real HTTP layer, socket connections, i18n, forms, SSR of
+data, auth, tests. `src/types/socket.ts` is the shared event contract — the API
+mirrors it in `src/domain/events.ts`; change both or neither.
 
 ## Architecture
 
@@ -119,9 +131,9 @@ today in `app/orders/page.tsx` and is marked `TODO(1.4)`.
   v16. Do not bump one without the other.
 - **Prettier uses `endOfLine: "lf"`** and `.gitattributes` sets `* text=auto eol=lf`
   to override the system-level `core.autocrlf=true` from Git for Windows.
-- `socket.io` (the **server** package) is a stray frontend dependency — nothing
-  imports it. The browser only needs `socket.io-client`. It is slated for removal
-  when the API repository is created in phase 1.2.
+- `socket.io-client` is installed but nothing imports it yet — the connection
+  lands in phase 1.3. The server-side `socket.io` package was removed from this
+  repository in phase 1.2; it lives in the API now. Do not add it back here.
 - `npm audit` reports pre-existing vulnerabilities, including a critical one in
   `next@15.2.2`. Upgrading is a deliberate, unmade decision — do not "fix" it
   incidentally.
