@@ -15,6 +15,8 @@ import {
   deleteAllOrderProduct,
   deleteOrder,
   deleteProduct,
+  fetchOrders,
+  fetchProducts,
 } from "./features/dataOrdersAndProducts/ordersAndProductsSlice";
 import { assertNever } from "@/types";
 import type { AppDispatch, RootState } from "./store";
@@ -45,8 +47,21 @@ startAppListening({
     // На сервере сокета нет — во время SSR подписывать некого.
     if (!socket) return;
 
+    // Первое подключение от переподключения отличается только историей,
+    // поэтому её приходится помнить здесь.
+    let wasConnected = false;
+
     const stopConnectionState = subscribeToConnectionState((isConnected) => {
       listenerApi.dispatch(setSocketConnected(isConnected));
+
+      if (isConnected && wasConnected) {
+        // Пока связи не было, события удаления шли мимо нас, и списки могли
+        // разойтись с сервером. Счётчик сессий сервер пришлёт сам, а данные
+        // надо перечитать — обычный запрос отсекся бы `condition`.
+        void listenerApi.dispatch(fetchOrders({ force: true }));
+        void listenerApi.dispatch(fetchProducts({ force: true }));
+      }
+      wasConnected = isConnected || wasConnected;
     });
 
     const stopEvents = subscribeToServerEvents((event) => {

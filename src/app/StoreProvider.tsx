@@ -1,11 +1,8 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Provider } from "react-redux";
 import { makeStore, type AppStore, type RootState } from "@/lib/store";
-import {
-  socketConnectionStarted,
-  socketConnectionStopped,
-} from "@/lib/features/session/sessionSlice";
+import { useSocket } from "@/hooks";
 
 interface StoreProviderProps {
   children: React.ReactNode;
@@ -16,6 +13,18 @@ interface StoreProviderProps {
    */
   preloadedState?: Partial<RootState>;
 }
+
+/**
+ * Держит соединение с сервером событий на всё время жизни приложения.
+ *
+ * Отдельный компонент, а не эффект в `StoreProvider`, по прозаичной причине:
+ * `useSocket` работает через `useAppDispatch`, а тот требует, чтобы над ним
+ * уже стоял `<Provider>`. Ничего не рендерит.
+ */
+const SocketConnection = () => {
+  useSocket();
+  return null;
+};
 
 export default function StoreProvider({
   children,
@@ -30,17 +39,10 @@ export default function StoreProvider({
     storeRef.current = makeStore(preloadedState);
   }
 
-  useEffect(() => {
-    // Подключение к сокету — команда стору, а не вызов из компонента: всю
-    // работу делает `listenerMiddleware`, здесь только жизненный цикл вкладки.
-    // TODO(1.3): переедет в хук `useSocket` вместе с остальными хуками фазы.
-    const store = storeRef.current;
-    store?.dispatch(socketConnectionStarted());
-
-    return () => {
-      store?.dispatch(socketConnectionStopped());
-    };
-  }, []);
-
-  return <Provider store={storeRef.current}>{children}</Provider>;
+  return (
+    <Provider store={storeRef.current}>
+      <SocketConnection />
+      {children}
+    </Provider>
+  );
 }

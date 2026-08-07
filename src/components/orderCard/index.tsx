@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { useState } from "react";
+import { useConfirm, useOrderStats } from "@/hooks";
 import ModalWindow from "../modalWindow";
 import styles from "./index.module.css";
 import {
@@ -10,29 +10,25 @@ import {
   toggleAsideContainer,
 } from "@/lib/features/orders/ordersSlice";
 import clsx from "clsx";
-import type { OrderId } from "@/types";
+import { formatDate, formatDateShort } from "@/utils/formatDate";
+import type { Order } from "@/types";
 
 export interface OrderCardProps {
-  orderId: OrderId;
-  title: string;
-  productsCount: number;
-  /** Уже отформатированные строки — форматирование живёт в `utils/formatDate`. */
-  date: string;
-  dateShort: string;
-  priceUSD: number;
-  priceUAH: number;
+  order: Order;
 }
 
-const OrderCard: React.FC<OrderCardProps> = ({
-  orderId,
-  title,
-  productsCount,
-  date,
-  dateShort,
-  priceUSD,
-  priceUAH,
-}) => {
-  const [showModal, setShowModal] = useState(false);
+/**
+ * Карточка прихода в списке.
+ *
+ * Счётчик продуктов и суммы карточка считает сама через `useOrderStats`:
+ * раньше их вычисляла страница и передавала шестью пропсами, хотя данные для
+ * этого лежат в сторе и доступны отсюда напрямую.
+ */
+const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
+  const { id: orderId, title } = order;
+
+  const confirmDelete = useConfirm();
+  const { productsCount, priceUSD, priceUAH } = useOrderStats(orderId);
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
   );
@@ -41,10 +37,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
   );
 
   const isSelected = selectedOrderId === orderId;
-
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
 
   const dispatch = useAppDispatch();
   return (
@@ -81,8 +73,8 @@ const OrderCard: React.FC<OrderCardProps> = ({
                 <span className="text-muted">{` Продукта`}</span>
               </div>
               <div className="d-flex flex-column align-items-center flex-shrink-0">
-                <div className="text-muted">{dateShort}</div>
-                <div className="text-muted fs-5">{date}</div>
+                <div className="text-muted">{formatDateShort(order.date)}</div>
+                <div className="text-muted fs-5">{formatDate(order.date)}</div>
               </div>
               {!isOpenAsideContainer && (
                 <div className="d-flex flex-column">
@@ -98,16 +90,17 @@ const OrderCard: React.FC<OrderCardProps> = ({
         {isSelected ? (
           <i className="bi bi-play-fill text-info fs-4 pe-2"></i>
         ) : (
-          <button className="btn btn-sm" onClick={handleOpenModal}>
+          <button className="btn btn-sm" onClick={confirmDelete.open}>
             <i className={`bi bi-trash pe-2 ${styles.icon}`}></i>
           </button>
         )}
       </div>
 
-      {showModal && (
+      {confirmDelete.isOpen && (
         <ModalWindow
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
+          isOpen={confirmDelete.isOpen}
+          onClose={confirmDelete.close}
+          /* TODO(1.5): вынести в словари next-intl */
           title={`Удалить заказ "${title}"?`}
           category="order"
           id={orderId}

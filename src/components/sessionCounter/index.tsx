@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { useAppSelector } from "@/lib/hooks";
+import { useSessionCount } from "@/hooks";
 import styles from "./index.module.css";
 
 /**
@@ -13,12 +13,7 @@ import styles from "./index.module.css";
  * экране последнее известное число.
  */
 const SessionCounter = () => {
-  const activeSessions = useAppSelector(
-    (state) => state.session.activeSessions
-  );
-  const isConnected = useAppSelector(
-    (state) => state.session.isSocketConnected
-  );
+  const { activeSessions, isConnected } = useSessionCount();
 
   return (
     <div

@@ -48,11 +48,11 @@ Phases 1.1 and 1.2 are complete. 1.2 built the API in the sibling repository
 delete, a socket.io gateway with a session counter, domain events, CORS,
 `ValidationPipe`, Docker.
 
-Phase 1.3 is in progress: the app talks to the API over HTTP and holds a
-socket.io connection. Still absent by design, not by oversight: custom hooks,
-404/error routes, i18n, forms, SSR of data, auth, tests. `src/types/socket.ts` is
-the shared event contract — the API mirrors it in `src/domain/events.ts`; change
-both or neither.
+Phases 1.1–1.3 are complete: the app talks to the API over HTTP, holds a
+socket.io connection, loads through thunks, and has `not-found` / `error` /
+`loading` routes. Still absent by design, not by oversight: i18n, forms, the left
+sidebar, SSR of data, auth, tests. `src/types/socket.ts` is the shared event
+contract — the API mirrors it in `src/domain/events.ts`; change both or neither.
 
 ## Architecture
 
@@ -77,8 +77,21 @@ in the store through the same reducers as a local one, so `deleteOrder` /
 `deleteAllOrderProduct` / `deleteProduct` now have two callers each — the delete
 thunks and the socket listener.
 
-Both pages (`app/orders/page.tsx`, `app/products/page.tsx`) are `"use client"`
-and dispatch the fetch thunks from `useEffect`. **The App Router is in use but
+Components do not dispatch `fetchOrders` / `fetchProducts` themselves — they call
+`useOrders()` / `useProducts()` from `@/hooks`, which return the list, a loading
+flag, the error and a `refetch`. The thunks' `condition` deduplicates, so calling
+the hook from several components is safe; `refetch` passes `{ force: true }` to
+get past that guard. The same flag is what the socket listener uses to reload
+both lists after a reconnect.
+
+`src/hooks/` holds the app-level hooks (data, clock, socket, modals, storage);
+`@/lib/hooks` stays what it was — the typed Redux wrappers.
+
+Both pages (`app/orders/page.tsx`, `app/products/page.tsx`) are `"use client"`.
+`/orders` and `/orders/[id]` both render `components/ordersView`; the deep-link
+page is a **server** component that validates the id format and calls
+`notFound()` before responding, then hands off to the client `OrderDeepLink`,
+which 404s when the id is well-formed but absent from the loaded list. **The App Router is in use but
 nothing is server-rendered from data yet** — this is the phase 2.1 rework;
 `StoreProvider` already accepts `preloadedState`, and `makeStore` merges it over
 the slices' `initialState`.

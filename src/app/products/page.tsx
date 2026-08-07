@@ -1,26 +1,22 @@
 "use client";
 
 import ProductsCard from "@/components/productsCard";
-import { fetchProducts } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import SelectCustom, { type ProductTypeFilter } from "@/components/select";
 import CardPlaceholder from "@/components/cardPlaceholder";
-import { ALL_PRODUCT_TYPES, isPendingStatus } from "@/types";
+import { ALL_PRODUCT_TYPES } from "@/types";
+import { useLocalStorage, useProducts } from "@/hooks";
 
 const PLACEHOLDER_COUNT = 8;
 
+/** Ключ в localStorage: выбранный фильтр переживает перезагрузку страницы. */
+const TYPE_FILTER_KEY = "products:type-filter";
+
 const Products = () => {
-  const [selectedType, setSelectedType] =
-    useState<ProductTypeFilter>(ALL_PRODUCT_TYPES);
-  const products = useAppSelector(
-    (state) => state.ordersAndProductsData.products
-  );
-  const status = useAppSelector(
-    (state) => state.ordersAndProductsData.productsStatus
-  );
-  const error = useAppSelector(
-    (state) => state.ordersAndProductsData.productsError
+  const { products, isLoading, error, refetch } = useProducts();
+  const [selectedType, setSelectedType] = useLocalStorage<ProductTypeFilter>(
+    TYPE_FILTER_KEY,
+    ALL_PRODUCT_TYPES
   );
 
   const filteredProducts = useMemo(
@@ -31,30 +27,33 @@ const Products = () => {
     [products, selectedType]
   );
 
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    // Приходы этой странице не нужны: она показывает плоский каталог.
-    // Раньше грузились оба списка просто потому, что эффект был скопирован.
-    void dispatch(fetchProducts());
-  }, [dispatch]);
-
-  const handleTypeChange = (type: ProductTypeFilter) => {
-    setSelectedType(type);
-  };
-
   const placeholders = Array.from({ length: PLACEHOLDER_COUNT });
 
   return (
     <div className="container">
       <h1 className="mb-4">Products</h1>
-      {/* TODO(1.5): вынести в словари next-intl */}
       {error && (
-        <div className="alert alert-danger" role="alert">
-          Не удалось загрузить продукты: {error.message}
+        <div
+          className="alert alert-danger d-flex align-items-center justify-content-between"
+          role="alert"
+        >
+          {/* TODO(1.5): вынести в словари next-intl */}
+          <span>Не удалось загрузить продукты: {error.message}</span>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-danger"
+            onClick={refetch}
+          >
+            Повторить
+          </button>
         </div>
       )}
-      <SelectCustom products={products} onTypeChange={handleTypeChange} />
-      {isPendingStatus(status) ? (
+      <SelectCustom
+        products={products}
+        value={selectedType}
+        onTypeChange={setSelectedType}
+      />
+      {isLoading ? (
         <div className="container mt-3 d-flex flex-column gap-3">
           {placeholders.map((_, index) => (
             <CardPlaceholder key={`placeholder-${index}`} />
@@ -67,7 +66,8 @@ const Products = () => {
               <ProductsCard key={product.id} product={product} />
             ))
           ) : (
-            <div className="alert alert-info">No products available</div>
+            // TODO(1.5): вынести в словари next-intl
+            <div className="alert alert-info">Продуктов нет</div>
           )}
         </div>
       )}

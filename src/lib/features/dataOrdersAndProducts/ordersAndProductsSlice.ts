@@ -40,12 +40,26 @@ const initialState: OrdersAndProductsState = {
  * Заодно это работает и на гидрации из `preloadedState` в фазе 2.1: серверный
  * рендер положит статус `succeeded`, и клиент за теми же данными не пойдёт.
  */
-const shouldSkipFetch = (status: RequestStatus): boolean =>
-  status === "loading" || status === "succeeded";
+const shouldSkipFetch = (
+  status: RequestStatus,
+  options: FetchOptions | undefined
+): boolean =>
+  options?.force !== true && (status === "loading" || status === "succeeded");
+
+/**
+ * `force` — «данные могли устареть, перечитай их заново».
+ *
+ * Нужен там, где список успел стать неправдой: после разрыва соединения
+ * (пока сокет молчал, кто-то мог удалить приход) и по кнопке «повторить»
+ * после ошибки. Без флага такой запрос отсекался бы `condition`.
+ */
+export interface FetchOptions {
+  force?: boolean;
+}
 
 export const fetchOrders = createAppAsyncThunk(
   "ordersAndProductsData/fetchOrders",
-  async (_: void, { signal, rejectWithValue }) => {
+  async (_options: FetchOptions | undefined, { signal, rejectWithValue }) => {
     try {
       return await api.getOrders({ signal });
     } catch (cause) {
@@ -53,14 +67,14 @@ export const fetchOrders = createAppAsyncThunk(
     }
   },
   {
-    condition: (_: void, { getState }) =>
-      !shouldSkipFetch(getState().ordersAndProductsData.ordersStatus),
+    condition: (options: FetchOptions | undefined, { getState }) =>
+      !shouldSkipFetch(getState().ordersAndProductsData.ordersStatus, options),
   }
 );
 
 export const fetchProducts = createAppAsyncThunk(
   "ordersAndProductsData/fetchProducts",
-  async (_: void, { signal, rejectWithValue }) => {
+  async (_options: FetchOptions | undefined, { signal, rejectWithValue }) => {
     try {
       return await api.getProducts({ signal });
     } catch (cause) {
@@ -68,8 +82,11 @@ export const fetchProducts = createAppAsyncThunk(
     }
   },
   {
-    condition: (_: void, { getState }) =>
-      !shouldSkipFetch(getState().ordersAndProductsData.productsStatus),
+    condition: (options: FetchOptions | undefined, { getState }) =>
+      !shouldSkipFetch(
+        getState().ordersAndProductsData.productsStatus,
+        options
+      ),
   }
 );
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ChangeEvent } from "react";
+import { useMemo, type ChangeEvent } from "react";
 import { ALL_PRODUCT_TYPES, type Product, type ProductType } from "@/types";
 
 /** Значение фильтра: конкретный тип продукта либо «все типы». */
@@ -8,32 +8,36 @@ export type ProductTypeFilter = ProductType | typeof ALL_PRODUCT_TYPES;
 
 interface SelectCustomProps {
   products: readonly Product[];
+  /**
+   * Управляемый компонент: выбранное значение приходит снаружи. Своего
+   * состояния у него было бы достаточно ровно до первого случая, когда фильтр
+   * задаётся не кликом — например, восстанавливается из localStorage: список
+   * фильтровался бы, а в самом `<select>` стояло бы «Все типы».
+   */
+  value: ProductTypeFilter;
   onTypeChange: (type: ProductTypeFilter) => void;
 }
 
 const SelectCustom: React.FC<SelectCustomProps> = ({
   products,
+  value,
   onTypeChange,
 }) => {
-  const [selectedType, setSelectedType] =
-    useState<ProductTypeFilter>(ALL_PRODUCT_TYPES);
-
   const productTypes = useMemo<ProductType[]>(
     () => [...new Set(products.map((product) => product.type))].sort(),
     [products]
   );
 
   const handleTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const newType: ProductTypeFilter = event.target.value;
-    setSelectedType(newType);
-    onTypeChange(newType);
+    onTypeChange(event.target.value);
   };
 
   return (
     <select
       className="form-select"
-      aria-label="Filter products by type"
-      value={selectedType}
+      // TODO(1.5): вынести в словари next-intl
+      aria-label="Фильтр продуктов по типу"
+      value={value}
       onChange={handleTypeChange}
     >
       {/* TODO(1.5): вынести в словари next-intl */}

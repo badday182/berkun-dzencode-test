@@ -1,35 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import SessionCounter from "../sessionCounter";
+import { useClock } from "@/hooks";
 
 const TopMenu = () => {
-  const [currentDateTime, setCurrentDateTime] = useState<Date>(new Date());
+  const currentDateTime = useClock();
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const formattedDate = currentDateTime.toLocaleDateString("ru-RU", {
+  // TODO(1.5): локаль зашита строкой, уедет в next-intl
+  const formattedDate = currentDateTime?.toLocaleDateString("ru-RU", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
-  const formattedTime = currentDateTime.toLocaleTimeString("ru-RU");
+  const formattedTime = currentDateTime?.toLocaleTimeString("ru-RU");
 
   return (
     <div className="container-fluid">
       <div className="ms-auto d-flex align-items-center gap-3">
         <SessionCounter />
+        {/* Пока часы не пошли, место под них зарезервировано неразрывным
+            пробелом — иначе шапка подпрыгивает после гидрации. */}
         <div className="d-flex flex-column align-items-end">
-          <div className="text-muted small">{formattedDate}</div>
-          <div className="fw-bold">{formattedTime}</div>
+          <div className="text-muted small">{formattedDate ?? " "}</div>
+          <div className="fw-bold">{formattedTime ?? " "}</div>
         </div>
       </div>
     </div>

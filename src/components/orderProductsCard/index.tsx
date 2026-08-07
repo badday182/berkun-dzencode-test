@@ -9,11 +9,11 @@ import clsx from "clsx";
 
 import styles from "./index.module.css";
 import ProductCard from "../productsCard";
-import { useState } from "react";
 import ModalWindow from "../modalWindow";
+import { useConfirm } from "@/hooks";
 
 const OrderProductsCard = () => {
-  const [showModal, setShowModal] = useState(false);
+  const confirmDelete = useConfirm();
 
   const dispatch = useAppDispatch();
   const products = useAppSelector(
@@ -38,10 +38,6 @@ const OrderProductsCard = () => {
     dispatch(setSelectedOrderId(null));
   };
 
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
-
   return (
     <>
       <div
@@ -62,7 +58,7 @@ const OrderProductsCard = () => {
               <div className="product-list gap-3 d-flex flex-column">
                 <div className="d-flex flex-row justify-content-between">
                   <h5 className="mb-3">{selectedOrderTitle}</h5>
-                  <button className="btn btn-sm" onClick={handleOpenModal}>
+                  <button className="btn btn-sm" onClick={confirmDelete.open}>
                     <i className={`bi bi-trash pe-2 ${styles.icon}`}></i>
                   </button>
                 </div>
@@ -78,10 +74,10 @@ const OrderProductsCard = () => {
           )}
         </div>
       </div>
-      {showModal && selectedOrderId !== null && (
+      {confirmDelete.isOpen && selectedOrderId !== null && (
         <ModalWindow
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
+          isOpen={confirmDelete.isOpen}
+          onClose={confirmDelete.close}
           title={`Удалить заказ "${selectedOrderTitle ?? ""}"?`}
           category="order"
           id={selectedOrderId}

@@ -3,9 +3,9 @@
 import { Currency, findPrice, type Product } from "@/types";
 import styles from "./index.module.css";
 import { useAppSelector } from "@/lib/hooks";
+import { useConfirm } from "@/hooks";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import ModalWindow from "../modalWindow";
 
 interface ProductCardProps {
@@ -13,7 +13,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const [showModal, setShowModal] = useState(false);
+  const confirmDelete = useConfirm();
 
   const orders = useAppSelector((state) => state.ordersAndProductsData.orders);
   const isOpenAsideContainer = useAppSelector(
@@ -33,10 +33,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const orderTitle =
     orders.find((order) => order.id === product.order)?.title ??
     "Default Order";
-
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
 
   return (
     <>
@@ -91,7 +87,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           <button
             className={clsx("btn btn-sm", styles.deleteButton)}
-            onClick={handleOpenModal}
+            onClick={confirmDelete.open}
           >
             <i
               className={`bi bi-trash ${styles.icon} ${styles.deleteButton__icon}`}
@@ -99,10 +95,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </button>
         </div>
       </div>
-      {showModal && (
+      {confirmDelete.isOpen && (
         <ModalWindow
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
+          isOpen={confirmDelete.isOpen}
+          onClose={confirmDelete.close}
           title={`Удалить продукт "${product.title}"?`}
           category="product"
           id={product.id}
