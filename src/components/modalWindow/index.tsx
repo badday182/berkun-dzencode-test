@@ -5,9 +5,8 @@ import { useAppDispatch } from "@/lib/hooks";
 
 import styles from "./index.module.css";
 import {
-  deleteAllOrderProduct,
-  deleteOrder,
-  deleteProduct,
+  removeOrder,
+  removeProduct,
 } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
 import {
   setSelectedOrderId,
@@ -57,15 +56,17 @@ const ModalWindow: React.FC<ModalWindowProps> = (props) => {
   }, [isOpen, onClose]);
 
   const handleDelete = () => {
+    // Удаление ушло на сервер: thunk сначала дожидается `204`, и только потом
+    // редьюсер убирает запись из стора. Каскад по продуктам прихода делает
+    // ветка `removeOrder.fulfilled`, поэтому здесь остаётся один диспатч.
     switch (props.category) {
       case "order":
-        dispatch(deleteOrder(props.id));
-        dispatch(deleteAllOrderProduct(props.id));
+        void dispatch(removeOrder(props.id));
         dispatch(toggleAsideContainer(false));
         dispatch(setSelectedOrderId(null));
         break;
       case "product":
-        dispatch(deleteProduct(props.id));
+        void dispatch(removeProduct(props.id));
         break;
       default:
         assertNever(props);

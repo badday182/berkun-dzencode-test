@@ -1,27 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { formatDate, formatDateShort } from "@/utils/formatDate";
 import getOrderStats from "@/utils/getOrderStats";
-import { ordersData, productsData } from "@/mocks";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import OrderCard from "@/components/orderCard";
 import clsx from "clsx";
 
 import OrderProductsCard from "@/components/orderProductsCard";
 import {
-  setOrders,
-  setProducts,
+  fetchOrders,
+  fetchProducts,
 } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
 import CardPlaceholder from "@/components/cardPlaceholder";
+import { isPendingStatus } from "@/types";
 
 const PLACEHOLDER_COUNT = 8;
 
 const Orders = () => {
-  const [loading, setLoading] = useState(true);
   const orders = useAppSelector((state) => state.ordersAndProductsData.orders);
   const products = useAppSelector(
     (state) => state.ordersAndProductsData.products
+  );
+  const ordersStatus = useAppSelector(
+    (state) => state.ordersAndProductsData.ordersStatus
+  );
+  const productsStatus = useAppSelector(
+    (state) => state.ordersAndProductsData.productsStatus
+  );
+  const error = useAppSelector(
+    (state) =>
+      state.ordersAndProductsData.ordersError ??
+      state.ordersAndProductsData.productsError
   );
 
   const dispatch = useAppDispatch();
@@ -30,40 +40,34 @@ const Orders = () => {
   );
 
   useEffect(() => {
-    // TODO(1.3): заменить на createAsyncThunk + axios, добавить состояние ошибки
-    const fetchData = async () => {
-      try {
-        // Simulating fetching the data
-        // Only dispatch if orders or products are empty/null
-        if (!orders || orders.length === 0) {
-          dispatch(setOrders(ordersData));
-        }
-
-        if (!products || products.length === 0) {
-          dispatch(setProducts(productsData));
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    // Повторный запрос отсекает `condition` самого thunk'а, поэтому эффект
+    // зависит только от `dispatch` — и список зависимостей наконец честный.
+    void dispatch(fetchOrders());
+    void dispatch(fetchProducts());
   }, [dispatch]);
 
+  // Продукты нужны карточке прихода для счётчиков и сумм, поэтому ждём оба
+  // запроса: показать приход с нулями, а через секунду с суммами — хуже.
+  const isLoading =
+    isPendingStatus(ordersStatus) || isPendingStatus(productsStatus);
   const placeholders = Array.from({ length: PLACEHOLDER_COUNT });
 
   return (
     <div className="container">
       <h1 className="mb-4">Orders</h1>
+      {/* TODO(1.5): вынести в словари next-intl */}
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          Не удалось загрузить данные: {error.message}
+        </div>
+      )}
       <div className="container mt-3 d-flex flex-row">
         {/* TODO(1.4): класс `orders` — литеральная строка, а не класс CSS-модуля,
             поэтому ширина 30% из index.module.css никогда не применялась.
             Разбирается вместе с раскладкой при вводе сайдбара. */}
         <div className={clsx("flex-grow-1", { orders: isOpenAsideContainer })}>
           <div>
-            {loading ? (
+            {isLoading ? (
               <div className="container mt-3 d-flex flex-column gap-3">
                 {placeholders.map((_, index) => (
                   <CardPlaceholder key={`placeholder-${index}`} />

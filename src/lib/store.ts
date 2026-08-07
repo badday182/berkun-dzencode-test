@@ -1,18 +1,31 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import ordersReducer from "./features/orders/ordersSlice";
 import ordersAndProductsReducer from "./features/dataOrdersAndProducts/ordersAndProductsSlice";
 
-export const makeStore = () => {
-  return configureStore({
-    reducer: {
-      orders: ordersReducer,
-      ordersAndProductsData: ordersAndProductsReducer,
-    },
-  });
-};
+/**
+ * Корневой редьюсер объявлен отдельно от стора намеренно: `RootState` выводится
+ * из него, а не из `makeStore`. Иначе `makeStore(preloadedState: RootState)`
+ * ссылался бы на тип, который сам же и порождает, и TypeScript упёрся бы в
+ * циклический вывод.
+ */
+const rootReducer = combineReducers({
+  orders: ordersReducer,
+  ordersAndProductsData: ordersAndProductsReducer,
+});
 
-// Infer the type of makeStore
+export type RootState = ReturnType<typeof rootReducer>;
+
+/**
+ * `preloadedState` — задел под SSR (фаза 2.1): сервер сложит уже загруженные
+ * приходы и продукты в состояние, клиент поднимет стор сразу с ними и не
+ * пойдёт за теми же данными второй раз. Отсутствующие слайсы получают свой
+ * `initialState`, поэтому передавать состояние целиком не требуется.
+ */
+export const makeStore = (preloadedState?: Partial<RootState>) =>
+  configureStore({
+    reducer: rootReducer,
+    preloadedState,
+  });
+
 export type AppStore = ReturnType<typeof makeStore>;
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<AppStore["getState"]>;
 export type AppDispatch = AppStore["dispatch"];

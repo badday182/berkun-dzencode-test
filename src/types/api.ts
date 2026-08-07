@@ -19,8 +19,18 @@ export interface ApiError {
   error?: string;
 }
 
-/** Состояние асинхронной операции в сторе. Заменит ручной `useState(loading)` в фазе 1.3. */
+/** Состояние асинхронной операции в сторе. Заменил ручной `useState(loading)` в фазе 1.3. */
 export type RequestStatus = "idle" | "loading" | "succeeded" | "failed";
+
+/**
+ * «Данных ещё нет, и они, возможно, в пути».
+ *
+ * `idle` попадает сюда наравне с `loading`: между первым рендером и запуском
+ * эффекта, который отправляет запрос, проходит кадр — и без этого условия
+ * пользователь успевал бы увидеть пустой список вместо скелетонов.
+ */
+export const isPendingStatus = (status: RequestStatus): boolean =>
+  status === "idle" || status === "loading";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;

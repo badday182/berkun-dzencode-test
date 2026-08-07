@@ -48,43 +48,60 @@ Phases 1.1 and 1.2 are complete. 1.2 built the API in the sibling repository
 delete, a socket.io gateway with a session counter, domain events, CORS,
 `ValidationPipe`, Docker.
 
-**This repository still does not talk to it.** Notably absent by design, not by
-oversight: axios, any real HTTP layer, socket connections, i18n, forms, SSR of
-data, auth, tests. `src/types/socket.ts` is the shared event contract — the API
-mirrors it in `src/domain/events.ts`; change both or neither.
+Phase 1.3 is in progress: the app now talks to the API over HTTP. Still absent
+by design, not by oversight: socket connections, i18n, forms, SSR of data, auth,
+tests. `src/types/socket.ts` is the shared event contract — the API mirrors it in
+`src/domain/events.ts`; change both or neither.
 
 ## Architecture
 
 ### Data flow
 
-`src/mocks/seed.json` → `src/mocks/index.ts` (validated through `parseOrder` /
-`parseProduct`) → page `useEffect` dispatches `setOrders` / `setProducts` →
-Redux → components read via `useAppSelector`.
+API (`:4000`) → `src/services/http.ts` (axios instance, errors normalised to
+`HttpError`) → `src/services/api/*` (typed methods; responses validated through
+`parseOrder` / `parseProduct`) → `fetchOrders` / `fetchProducts` thunks → Redux →
+components read via `useAppSelector`.
+
+Import request functions from `@/services/api`, never `@/services/http` directly
+— the transport is internal, and phase 2.3 may move reads to GraphQL behind the
+same six functions. Everything under `src/services/` is isomorphic: no `window`,
+no React, no Redux, so phase 2.1 can call it from Server Components. Per-request
+tweaks go through the narrow `RequestOptions` (`signal`, `headers`).
 
 Both pages (`app/orders/page.tsx`, `app/products/page.tsx`) are `"use client"`
-and load data in `useEffect`. **The App Router is in use but nothing is
-server-rendered from data yet** — this is the phase 2.1 rework. Any data-fetch
-code you add should be written so it can run on both server and client, and
-`StoreProvider` should stay compatible with `preloadedState`.
+and dispatch the fetch thunks from `useEffect`. **The App Router is in use but
+nothing is server-rendered from data yet** — this is the phase 2.1 rework;
+`StoreProvider` already accepts `preloadedState`, and `makeStore` merges it over
+the slices' `initialState`.
 
-`seed.json` is destined to become the seed of a separate NestJS API repository
-(phase 1.2), so keep it a plain data file.
+`src/mocks/` is no longer wired to anything — it survives as fixtures for the
+MSW/Vitest work in phase 2.6. Do not reconnect pages to it.
 
 ### Redux store (`src/lib/`)
 
 Two slices with a deliberate split:
 
 - `features/dataOrdersAndProducts/ordersAndProductsSlice.ts` — the domain data
-  (orders, products) and deletions.
+  (orders, products), their request status/error, the `fetchOrders` /
+  `fetchProducts` / `removeOrder` / `removeProduct` thunks and the local
+  deletion reducers.
 - `features/orders/ordersSlice.ts` — **UI selection state only**: which order is
   selected, its title, whether the side panel is open.
 
 Use the typed hooks from `src/lib/hooks.ts` (`useAppDispatch`, `useAppSelector`),
 never the raw react-redux ones.
 
-Deleting an order requires dispatching **both** `deleteOrder` and
-`deleteAllOrderProduct` with the same `OrderId`, otherwise products are orphaned.
-`ModalWindow` is currently the only place that does this correctly.
+Delete through the `removeOrder` / `removeProduct` thunks, not the plain
+reducers — the thunk waits for the server's `204` before touching the store, so
+the UI never shows a deletion the API rejected. `removeOrder.fulfilled` runs
+`deleteOrder` **and** `deleteAllOrderProduct` together; dispatching the plain
+`deleteOrder` on its own leaves orphaned products, which is why the pair lives
+in one place now.
+
+New async work uses `createAppAsyncThunk` from `src/lib/createAppAsyncThunk.ts`
+(typed `state`/`dispatch`/`rejectValue: ApiError`) and rejects with
+`rejectWithValue(toApiError(cause))` — a raw `Error` is not serialisable and
+must not reach the store.
 
 ### Type system (`src/types/`)
 
