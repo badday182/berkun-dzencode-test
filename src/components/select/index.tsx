@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, type ChangeEvent } from "react";
+import { useTranslations } from "next-intl";
 import { ALL_PRODUCT_TYPES, type Product, type ProductType } from "@/types";
 
 /** Значение фильтра: конкретный тип продукта либо «все типы». */
@@ -23,6 +24,8 @@ const SelectCustom: React.FC<SelectCustomProps> = ({
   value,
   onTypeChange,
 }) => {
+  const t = useTranslations("products");
+
   const productTypes = useMemo<ProductType[]>(
     () => [...new Set(products.map((product) => product.type))].sort(),
     [products]
@@ -35,13 +38,13 @@ const SelectCustom: React.FC<SelectCustomProps> = ({
   return (
     <select
       className="form-select"
-      // TODO(1.5): вынести в словари next-intl
-      aria-label="Фильтр продуктов по типу"
+      aria-label={t("filterLabel")}
       value={value}
       onChange={handleTypeChange}
     >
-      {/* TODO(1.5): вынести в словари next-intl */}
-      <option value={ALL_PRODUCT_TYPES}>Все типы</option>
+      {/* Сами типы продуктов не переводятся: это каталожные данные бэкенда,
+          а не строки интерфейса. */}
+      <option value={ALL_PRODUCT_TYPES}>{t("allTypes")}</option>
       {productTypes.map((type) => (
         <option key={type} value={type}>
           {type}

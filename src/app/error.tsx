@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -17,6 +18,8 @@ interface ErrorPageProps {
  * компоненте.
  */
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
+  const t = useTranslations("error");
+
   useEffect(() => {
     // TODO(2.7): вместо консоли — отправка в систему мониторинга.
     console.error("Необработанная ошибка рендера:", error);
@@ -24,11 +27,10 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
 
   return (
     <div className="container py-5 text-center">
-      {/* TODO(1.5): вынести в словари next-intl */}
-      <h1 className="h4 mb-3">Что-то пошло не так</h1>
+      <h1 className="h4 mb-3">{t("title")}</h1>
       <p className="text-muted mb-4">{error.message}</p>
       <button type="button" className="btn btn-primary" onClick={reset}>
-        Попробовать снова
+        {t("retry")}
       </button>
     </div>
   );

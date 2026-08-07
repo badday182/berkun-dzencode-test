@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import { useSessionCount } from "@/hooks";
 import styles from "./index.module.css";
 
@@ -14,12 +15,12 @@ import styles from "./index.module.css";
  */
 const SessionCounter = () => {
   const { activeSessions, isConnected } = useSessionCount();
+  const t = useTranslations("session");
 
   return (
     <div
       className={clsx("d-flex align-items-center gap-2", styles.counter)}
-      // TODO(1.5): вынести в словари next-intl
-      title={isConnected ? "Активных сессий" : "Нет связи с сервером"}
+      title={isConnected ? t("activeSessions") : t("noConnection")}
     >
       {/* Не `{ [styles.x]: cond }`: под `noUncheckedIndexedAccess` класс
           модуля имеет тип `string | undefined` и вычисляемым ключом быть
@@ -34,13 +35,11 @@ const SessionCounter = () => {
       {isConnected ? (
         <span className="small">
           <i className="bi bi-people me-1" aria-hidden="true" />
-          {/* TODO(1.5): вынести в словари next-intl */}
           <span className="fw-bold">{activeSessions}</span>
-          <span className="text-muted"> в сети</span>
+          <span className="text-muted"> {t("online")}</span>
         </span>
       ) : (
-        // TODO(1.5): вынести в словари next-intl
-        <span className="small text-muted">нет связи</span>
+        <span className="small text-muted">{t("offline")}</span>
       )}
     </div>
   );

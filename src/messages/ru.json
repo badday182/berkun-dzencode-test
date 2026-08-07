@@ -1,0 +1,118 @@
+{
+  "app": {
+    "brand": "DzenCode"
+  },
+  "metadata": {
+    "title": "DzenCode — приходы и продукты",
+    "description": "Учёт приходов и продуктов на складе"
+  },
+  "nav": {
+    "orders": "Приходы",
+    "products": "Продукты",
+    "dashboard": "Дашборд",
+    "settings": "Настройки",
+    "inDevelopment": "{section} — раздел в разработке",
+    "expand": "Развернуть меню",
+    "collapse": "Свернуть меню",
+    "openMenu": "Открыть меню"
+  },
+  "topbar": {
+    "guest": "Гость",
+    "language": "Язык интерфейса"
+  },
+  "session": {
+    "online": "в сети",
+    "offline": "нет связи",
+    "activeSessions": "Активных сессий",
+    "noConnection": "Нет связи с сервером"
+  },
+  "orders": {
+    "title": "Приходы",
+    "total": "Всего: {count}",
+    "loading": "Загрузка…",
+    "empty": "Приходов пока нет. Добавьте первый.",
+    "loadError": "Не удалось загрузить данные: {message}",
+    "productsCount": "{count, plural, one {# продукт} few {# продукта} other {# продуктов}}",
+    "add": "Добавить приход",
+    "addTitle": "Новый приход",
+    "deleteTitle": "Удалить приход «{title}»?",
+    "noProducts": "В этом приходе нет продуктов"
+  },
+  "products": {
+    "title": "Продукты",
+    "shown": "Показано {shown} из {total}",
+    "loading": "Загрузка…",
+    "empty": "Продуктов по этому фильтру нет",
+    "loadError": "Не удалось загрузить продукты: {message}",
+    "add": "Добавить продукт",
+    "addTitle": "Новый продукт",
+    "deleteTitle": "Удалить продукт «{title}»?",
+    "allTypes": "Все типы",
+    "filterLabel": "Фильтр продуктов по типу",
+    "guaranteeFrom": "с:",
+    "guaranteeTo": "по:"
+  },
+  "common": {
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "save": "Сохранить",
+    "saving": "Сохранение…",
+    "retry": "Повторить",
+    "close": "Закрыть",
+    "loadingForm": "Загрузка формы…"
+  },
+  "modal": {
+    "confirmDeleteOrder": "Вы уверены, что хотите удалить этот приход и все его продукты?",
+    "confirmDeleteProduct": "Вы уверены, что хотите удалить этот продукт?"
+  },
+  "orderForm": {
+    "title": "Название",
+    "titlePlaceholder": "Приход от поставщика",
+    "date": "Дата",
+    "description": "Описание"
+  },
+  "productForm": {
+    "title": "Название",
+    "titlePlaceholder": "Монитор Dell U2720Q",
+    "type": "Тип",
+    "typePlaceholder": "Мониторы",
+    "serialNumber": "Серийный номер",
+    "condition": "Состояние",
+    "conditionNew": "Новый",
+    "conditionUsed": "Б/у",
+    "order": "Приход",
+    "orderPlaceholder": "— выберите приход —",
+    "date": "Дата поступления",
+    "guaranteeStart": "Гарантия с",
+    "guaranteeEnd": "Гарантия по",
+    "priceUSD": "Цена, USD",
+    "priceUAH": "Цена, UAH",
+    "photo": "Файл фотографии",
+    "specification": "Характеристики"
+  },
+  "validation": {
+    "required": "Обязательное поле",
+    "minLength": "Не короче {count} символов",
+    "maxLength": "Не длиннее {count} символов",
+    "titleRequired": "Укажите название",
+    "dateRequired": "Укажите дату",
+    "descriptionRequired": "Добавьте описание",
+    "digitsOnly": "Только цифры",
+    "integer": "Целое число",
+    "positive": "Больше нуля",
+    "notNegative": "Не может быть отрицательной",
+    "selectOrder": "Выберите приход",
+    "guaranteeOrder": "Конец гарантии раньше начала"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Страница не найдена",
+    "description": "Возможно, приход удалили, или в адресе опечатка.",
+    "toOrders": "К приходам",
+    "toProducts": "К продуктам"
+  },
+  "error": {
+    "title": "Что-то пошло не так",
+    "retry": "Попробовать снова"
+  }
+}

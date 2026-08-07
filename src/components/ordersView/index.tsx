@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import { useAppSelector } from "@/lib/hooks";
 import { useOrders, useProducts } from "@/hooks";
 import OrderCard from "../orderCard";
@@ -19,6 +20,7 @@ const PLACEHOLDER_COUNT = 8;
  * адресу. Дублировать разметку ради этого не пришлось.
  */
 const OrdersView = () => {
+  const t = useTranslations();
   const {
     orders,
     isLoading: isOrdersLoading,
@@ -50,11 +52,12 @@ const OrdersView = () => {
   return (
     <div className={styles.page}>
       <div className={styles.page__header}>
-        {/* TODO(1.5): вынести в словари next-intl */}
         <div>
-          <h1 className={styles.page__title}>Приходы</h1>
+          <h1 className={styles.page__title}>{t("orders.title")}</h1>
           <p className={styles.page__subtitle}>
-            {isLoading ? "Загрузка…" : `Всего: ${orders.length}`}
+            {isLoading
+              ? t("orders.loading")
+              : t("orders.total", { count: orders.length })}
           </p>
         </div>
         <AddOrderButton />
@@ -65,14 +68,13 @@ const OrdersView = () => {
           className="alert alert-danger d-flex align-items-center justify-content-between gap-3"
           role="alert"
         >
-          {/* TODO(1.5): вынести в словари next-intl */}
-          <span>Не удалось загрузить данные: {error.message}</span>
+          <span>{t("orders.loadError", { message: error.message })}</span>
           <button
             type="button"
             className="btn btn-sm btn-outline-danger flex-shrink-0"
             onClick={retry}
           >
-            Повторить
+            {t("common.retry")}
           </button>
         </div>
       )}
@@ -101,10 +103,7 @@ const OrdersView = () => {
               ))}
             </div>
           ) : (
-            // TODO(1.5): вынести в словари next-intl
-            <div className="alert alert-info mb-0">
-              Приходов пока нет. Добавьте первый.
-            </div>
+            <div className="alert alert-info mb-0">{t("orders.empty")}</div>
           )}
         </div>
 

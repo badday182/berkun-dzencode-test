@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 import styles from "./index.module.css";
 
 export interface ModalProps {
@@ -32,6 +33,7 @@ const Modal: React.FC<ModalProps> = ({
   size = "default",
 }) => {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const t = useTranslations("common");
 
   useEffect(() => {
     if (!isOpen) return;
@@ -75,8 +77,7 @@ const Modal: React.FC<ModalProps> = ({
                 type="button"
                 className="btn-close"
                 onClick={onClose}
-                // TODO(1.5): вынести в словари next-intl
-                aria-label="Закрыть"
+                aria-label={t("close")}
               />
             </div>
             <div className="modal-body">{children}</div>

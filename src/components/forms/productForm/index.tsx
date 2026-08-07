@@ -2,7 +2,8 @@
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch } from "@/lib/hooks";
 import { addProduct } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
 import { toApiError } from "@/services/api";
@@ -22,42 +23,8 @@ export interface ProductFormProps {
 const toApiDate = (localValue: string): string =>
   `${localValue.replace("T", " ")}:00`;
 
-// TODO(1.5): сообщения валидации — через t() из next-intl
-const REQUIRED = "Обязательное поле";
-
-const validationSchema = Yup.object({
-  title: Yup.string().trim().min(2, "Не короче 2 символов").required(REQUIRED),
-  type: Yup.string().trim().required(REQUIRED),
-  serialNumber: Yup.number()
-    .typeError("Только цифры")
-    .integer("Целое число")
-    .positive("Больше нуля")
-    .required(REQUIRED),
-  isNew: Yup.number().oneOf([ProductCondition.Used, ProductCondition.New]),
-  photo: Yup.string().trim().required(REQUIRED),
-  specification: Yup.string().trim().max(300, "Не длиннее 300 символов"),
-  order: Yup.number().typeError("Выберите приход").required("Выберите приход"),
-  date: Yup.string().required(REQUIRED),
-  guaranteeStart: Yup.string().required(REQUIRED),
-  guaranteeEnd: Yup.string()
-    .required(REQUIRED)
-    .test(
-      "after-start",
-      "Конец гарантии раньше начала",
-      (value, context) =>
-        !value ||
-        !context.parent.guaranteeStart ||
-        value >= context.parent.guaranteeStart
-    ),
-  priceUSD: Yup.number()
-    .typeError("Только цифры")
-    .min(0, "Не может быть отрицательной")
-    .required(REQUIRED),
-  priceUAH: Yup.number()
-    .typeError("Только цифры")
-    .min(0, "Не может быть отрицательной")
-    .required(REQUIRED),
-});
+const TITLE_MIN = 2;
+const SPECIFICATION_MAX = 300;
 
 /**
  * Плоские значения формы. Вложенность (`guarantee`, массив `price`) собирается
@@ -96,8 +63,62 @@ const initialValues: ProductFormValues = {
 
 const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
   const dispatch = useAppDispatch();
+  const t = useTranslations();
   const { orders } = useOrders();
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const validationSchema = useMemo(
+    () =>
+      Yup.object({
+        title: Yup.string()
+          .trim()
+          .min(TITLE_MIN, t("validation.minLength", { count: TITLE_MIN }))
+          .required(t("validation.required")),
+        type: Yup.string().trim().required(t("validation.required")),
+        serialNumber: Yup.number()
+          .typeError(t("validation.digitsOnly"))
+          .integer(t("validation.integer"))
+          .positive(t("validation.positive"))
+          .required(t("validation.required")),
+        isNew: Yup.number().oneOf([
+          ProductCondition.Used,
+          ProductCondition.New,
+        ]),
+        photo: Yup.string().trim().required(t("validation.required")),
+        specification: Yup.string()
+          .trim()
+          .max(
+            SPECIFICATION_MAX,
+            t("validation.maxLength", { count: SPECIFICATION_MAX })
+          ),
+        order: Yup.number()
+          .typeError(t("validation.selectOrder"))
+          .required(t("validation.selectOrder")),
+        date: Yup.string().required(t("validation.required")),
+        guaranteeStart: Yup.string().required(t("validation.required")),
+        guaranteeEnd: Yup.string()
+          .required(t("validation.required"))
+          .test(
+            "after-start",
+            t("validation.guaranteeOrder"),
+            // Строки `datetime-local` сравнимы лексикографически: формат
+            // фиксированный, от старшего разряда к младшему.
+            (value, context) =>
+              !value ||
+              !context.parent.guaranteeStart ||
+              value >= context.parent.guaranteeStart
+          ),
+        priceUSD: Yup.number()
+          .typeError(t("validation.digitsOnly"))
+          .min(0, t("validation.notNegative"))
+          .required(t("validation.required")),
+        priceUAH: Yup.number()
+          .typeError(t("validation.digitsOnly"))
+          .min(0, t("validation.notNegative"))
+          .required(t("validation.required")),
+      }),
+    [t]
+  );
 
   const handleSubmit = async (values: ProductFormValues) => {
     setServerError(null);
@@ -140,17 +161,16 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
     >
       {({ isSubmitting, isValid, dirty }) => (
         <Form noValidate>
-          {/* TODO(1.5): подписи вынести в словари next-intl */}
           <div className="row g-3">
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-title">
-                Название
+                {t("productForm.title")}
               </label>
               <Field
                 id="product-title"
                 name="title"
                 className="form-control"
-                placeholder="Монитор Dell U2720Q"
+                placeholder={t("productForm.titlePlaceholder")}
               />
               <ErrorMessage
                 name="title"
@@ -161,13 +181,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-type">
-                Тип
+                {t("productForm.type")}
               </label>
               <Field
                 id="product-type"
                 name="type"
                 className="form-control"
-                placeholder="Мониторы"
+                placeholder={t("productForm.typePlaceholder")}
               />
               <ErrorMessage
                 name="type"
@@ -178,7 +198,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-serial">
-                Серийный номер
+                {t("productForm.serialNumber")}
               </label>
               <Field
                 id="product-serial"
@@ -195,7 +215,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-condition">
-                Состояние
+                {t("productForm.condition")}
               </label>
               <Field
                 id="product-condition"
@@ -203,14 +223,18 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
                 as="select"
                 className="form-select"
               >
-                <option value={ProductCondition.New}>Новый</option>
-                <option value={ProductCondition.Used}>Б/у</option>
+                <option value={ProductCondition.New}>
+                  {t("productForm.conditionNew")}
+                </option>
+                <option value={ProductCondition.Used}>
+                  {t("productForm.conditionUsed")}
+                </option>
               </Field>
             </div>
 
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-order">
-                Приход
+                {t("productForm.order")}
               </label>
               <Field
                 id="product-order"
@@ -218,7 +242,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
                 as="select"
                 className="form-select"
               >
-                <option value="">— выберите приход —</option>
+                <option value="">{t("productForm.orderPlaceholder")}</option>
                 {orders.map((order) => (
                   <option key={order.id} value={order.id}>
                     {order.title}
@@ -234,7 +258,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-date">
-                Дата поступления
+                {t("productForm.date")}
               </label>
               <Field
                 id="product-date"
@@ -251,7 +275,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-guarantee-start">
-                Гарантия с
+                {t("productForm.guaranteeStart")}
               </label>
               <Field
                 id="product-guarantee-start"
@@ -268,7 +292,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-guarantee-end">
-                Гарантия по
+                {t("productForm.guaranteeEnd")}
               </label>
               <Field
                 id="product-guarantee-end"
@@ -285,7 +309,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-price-usd">
-                Цена, USD
+                {t("productForm.priceUSD")}
               </label>
               <Field
                 id="product-price-usd"
@@ -303,7 +327,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12 col-md-6">
               <label className="form-label" htmlFor="product-price-uah">
-                Цена, UAH
+                {t("productForm.priceUAH")}
               </label>
               <Field
                 id="product-price-uah"
@@ -321,7 +345,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12">
               <label className="form-label" htmlFor="product-photo">
-                Файл фотографии
+                {t("productForm.photo")}
               </label>
               <Field id="product-photo" name="photo" className="form-control" />
               {/* TODO(2.5): загрузка изображения и `next/image` вместо строки */}
@@ -334,7 +358,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
 
             <div className="col-12">
               <label className="form-label" htmlFor="product-specification">
-                Характеристики
+                {t("productForm.specification")}
               </label>
               <Field
                 id="product-specification"
@@ -364,14 +388,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel }) => {
               onClick={onCancel}
               disabled={isSubmitting}
             >
-              Отмена
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={isSubmitting || !isValid || !dirty}
             >
-              {isSubmitting ? "Сохранение…" : "Сохранить"}
+              {isSubmitting ? t("common.saving") : t("common.save")}
             </button>
           </div>
         </Form>

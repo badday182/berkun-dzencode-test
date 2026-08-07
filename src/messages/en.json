@@ -1,0 +1,118 @@
+{
+  "app": {
+    "brand": "DzenCode"
+  },
+  "metadata": {
+    "title": "DzenCode — orders and products",
+    "description": "Warehouse orders and products management"
+  },
+  "nav": {
+    "orders": "Orders",
+    "products": "Products",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "inDevelopment": "{section} — section under development",
+    "expand": "Expand menu",
+    "collapse": "Collapse menu",
+    "openMenu": "Open menu"
+  },
+  "topbar": {
+    "guest": "Guest",
+    "language": "Interface language"
+  },
+  "session": {
+    "online": "online",
+    "offline": "offline",
+    "activeSessions": "Active sessions",
+    "noConnection": "No connection to the server"
+  },
+  "orders": {
+    "title": "Orders",
+    "total": "Total: {count}",
+    "loading": "Loading…",
+    "empty": "No orders yet. Add the first one.",
+    "loadError": "Failed to load data: {message}",
+    "productsCount": "{count, plural, one {# product} other {# products}}",
+    "add": "Add order",
+    "addTitle": "New order",
+    "deleteTitle": "Delete order “{title}”?",
+    "noProducts": "This order has no products"
+  },
+  "products": {
+    "title": "Products",
+    "shown": "Showing {shown} of {total}",
+    "loading": "Loading…",
+    "empty": "No products match this filter",
+    "loadError": "Failed to load products: {message}",
+    "add": "Add product",
+    "addTitle": "New product",
+    "deleteTitle": "Delete product “{title}”?",
+    "allTypes": "All types",
+    "filterLabel": "Filter products by type",
+    "guaranteeFrom": "from:",
+    "guaranteeTo": "to:"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "saving": "Saving…",
+    "retry": "Retry",
+    "close": "Close",
+    "loadingForm": "Loading the form…"
+  },
+  "modal": {
+    "confirmDeleteOrder": "Delete this order and all of its products?",
+    "confirmDeleteProduct": "Delete this product?"
+  },
+  "orderForm": {
+    "title": "Title",
+    "titlePlaceholder": "Supplier delivery",
+    "date": "Date",
+    "description": "Description"
+  },
+  "productForm": {
+    "title": "Title",
+    "titlePlaceholder": "Dell U2720Q monitor",
+    "type": "Type",
+    "typePlaceholder": "Monitors",
+    "serialNumber": "Serial number",
+    "condition": "Condition",
+    "conditionNew": "New",
+    "conditionUsed": "Used",
+    "order": "Order",
+    "orderPlaceholder": "— select an order —",
+    "date": "Arrival date",
+    "guaranteeStart": "Warranty from",
+    "guaranteeEnd": "Warranty to",
+    "priceUSD": "Price, USD",
+    "priceUAH": "Price, UAH",
+    "photo": "Photo file",
+    "specification": "Specification"
+  },
+  "validation": {
+    "required": "Required field",
+    "minLength": "At least {count} characters",
+    "maxLength": "At most {count} characters",
+    "titleRequired": "Enter a title",
+    "dateRequired": "Pick a date",
+    "descriptionRequired": "Add a description",
+    "digitsOnly": "Digits only",
+    "integer": "Whole number",
+    "positive": "Greater than zero",
+    "notNegative": "Cannot be negative",
+    "selectOrder": "Select an order",
+    "guaranteeOrder": "Warranty ends before it starts"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "description": "The order may have been deleted, or there is a typo in the address.",
+    "toOrders": "Go to orders",
+    "toProducts": "Go to products"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "retry": "Try again"
+  }
+}

@@ -5,7 +5,9 @@ import styles from "./index.module.css";
 import { useAppSelector } from "@/lib/hooks";
 import { useConfirm } from "@/hooks";
 import clsx from "clsx";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
+import { formatDateOnly } from "@/utils/formatDate";
 import ModalWindow from "../modalWindow";
 
 interface ProductCardProps {
@@ -14,6 +16,8 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const confirmDelete = useConfirm();
+  const t = useTranslations("products");
+  const locale = useLocale();
 
   const orders = useAppSelector((state) => state.ordersAndProductsData.orders);
   const isOpenAsideContainer = useAppSelector(
@@ -25,14 +29,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const uahPrice = findPrice(product.price, Currency.UAH);
 
   // TODO(2.1): форматировать в UTC, иначе SSR даст hydration mismatch
-  const guaranteeStartDate = new Date(
-    product.guarantee.start
-  ).toLocaleDateString();
-  const guaranteeEndDate = new Date(product.guarantee.end).toLocaleDateString();
+  const guaranteeStartDate = formatDateOnly(product.guarantee.start, locale);
+  const guaranteeEndDate = formatDateOnly(product.guarantee.end, locale);
 
+  // Приход может быть ещё не загружен — тогда показывать нечего, и пустая
+  // строка честнее выдуманного «Default Order».
   const orderTitle =
-    orders.find((order) => order.id === product.order)?.title ??
-    "Default Order";
+    orders.find((order) => order.id === product.order)?.title ?? "";
 
   return (
     <>
@@ -54,11 +57,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
             <div className={styles.guarantee}>
               <div>
-                <span className="text-muted">с: </span>
+                <span className="text-muted">{t("guaranteeFrom")} </span>
                 <span className="text-muted">{guaranteeStartDate}</span>
               </div>
               <div>
-                <span className="text-muted">по: </span>
+                <span className="text-muted">{t("guaranteeTo")} </span>
                 <span className="text-muted fs-6">{guaranteeEndDate}</span>
               </div>
             </div>
@@ -99,7 +102,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <ModalWindow
           isOpen={confirmDelete.isOpen}
           onClose={confirmDelete.close}
-          title={`Удалить продукт "${product.title}"?`}
+          title={t("deleteTitle", { title: product.title })}
           category="product"
           id={product.id}
         />

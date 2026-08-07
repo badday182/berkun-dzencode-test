@@ -1,0 +1,118 @@
+{
+  "app": {
+    "brand": "DzenCode"
+  },
+  "metadata": {
+    "title": "DzenCode — приходи та продукти",
+    "description": "Облік приходів та продуктів на складі"
+  },
+  "nav": {
+    "orders": "Прихід",
+    "products": "Продукти",
+    "dashboard": "Дашборд",
+    "settings": "Налаштування",
+    "inDevelopment": "{section} — розділ у розробці",
+    "expand": "Розгорнути меню",
+    "collapse": "Згорнути меню",
+    "openMenu": "Відкрити меню"
+  },
+  "topbar": {
+    "guest": "Гість",
+    "language": "Мова інтерфейсу"
+  },
+  "session": {
+    "online": "у мережі",
+    "offline": "немає зв'язку",
+    "activeSessions": "Активних сесій",
+    "noConnection": "Немає зв'язку із сервером"
+  },
+  "orders": {
+    "title": "Приходи",
+    "total": "Усього: {count}",
+    "loading": "Завантаження…",
+    "empty": "Приходів ще немає. Додайте перший.",
+    "loadError": "Не вдалося завантажити дані: {message}",
+    "productsCount": "{count, plural, one {# продукт} few {# продукти} other {# продуктів}}",
+    "add": "Додати прихід",
+    "addTitle": "Новий прихід",
+    "deleteTitle": "Видалити прихід «{title}»?",
+    "noProducts": "У цьому приході немає продуктів"
+  },
+  "products": {
+    "title": "Продукти",
+    "shown": "Показано {shown} з {total}",
+    "loading": "Завантаження…",
+    "empty": "Продуктів за цим фільтром немає",
+    "loadError": "Не вдалося завантажити продукти: {message}",
+    "add": "Додати продукт",
+    "addTitle": "Новий продукт",
+    "deleteTitle": "Видалити продукт «{title}»?",
+    "allTypes": "Усі типи",
+    "filterLabel": "Фільтр продуктів за типом",
+    "guaranteeFrom": "з:",
+    "guaranteeTo": "по:"
+  },
+  "common": {
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "save": "Зберегти",
+    "saving": "Збереження…",
+    "retry": "Повторити",
+    "close": "Закрити",
+    "loadingForm": "Завантаження форми…"
+  },
+  "modal": {
+    "confirmDeleteOrder": "Ви впевнені, що хочете видалити цей прихід і всі його продукти?",
+    "confirmDeleteProduct": "Ви впевнені, що хочете видалити цей продукт?"
+  },
+  "orderForm": {
+    "title": "Назва",
+    "titlePlaceholder": "Прихід від постачальника",
+    "date": "Дата",
+    "description": "Опис"
+  },
+  "productForm": {
+    "title": "Назва",
+    "titlePlaceholder": "Монітор Dell U2720Q",
+    "type": "Тип",
+    "typePlaceholder": "Монітори",
+    "serialNumber": "Серійний номер",
+    "condition": "Стан",
+    "conditionNew": "Новий",
+    "conditionUsed": "Вживаний",
+    "order": "Прихід",
+    "orderPlaceholder": "— оберіть прихід —",
+    "date": "Дата надходження",
+    "guaranteeStart": "Гарантія з",
+    "guaranteeEnd": "Гарантія до",
+    "priceUSD": "Ціна, USD",
+    "priceUAH": "Ціна, UAH",
+    "photo": "Файл фотографії",
+    "specification": "Характеристики"
+  },
+  "validation": {
+    "required": "Обов'язкове поле",
+    "minLength": "Не коротше {count} символів",
+    "maxLength": "Не довше {count} символів",
+    "titleRequired": "Вкажіть назву",
+    "dateRequired": "Вкажіть дату",
+    "descriptionRequired": "Додайте опис",
+    "digitsOnly": "Лише цифри",
+    "integer": "Ціле число",
+    "positive": "Більше за нуль",
+    "notNegative": "Не може бути від'ємною",
+    "selectOrder": "Оберіть прихід",
+    "guaranteeOrder": "Кінець гарантії раніше за початок"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Сторінку не знайдено",
+    "description": "Можливо, прихід видалили, або в адресі помилка.",
+    "toOrders": "До приходів",
+    "toProducts": "До продуктів"
+  },
+  "error": {
+    "title": "Щось пішло не так",
+    "retry": "Спробувати ще раз"
+  }
+}

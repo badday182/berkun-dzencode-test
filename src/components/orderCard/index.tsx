@@ -10,6 +10,7 @@ import {
   toggleAsideContainer,
 } from "@/lib/features/orders/ordersSlice";
 import clsx from "clsx";
+import { useLocale, useTranslations } from "next-intl";
 import { formatDate, formatDateShort } from "@/utils/formatDate";
 import type { Order } from "@/types";
 
@@ -28,6 +29,8 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   const { id: orderId, title } = order;
 
   const confirmDelete = useConfirm();
+  const t = useTranslations("orders");
+  const locale = useLocale();
   const { productsCount, priceUSD, priceUAH } = useOrderStats(orderId);
   const isOpenAsideContainer = useAppSelector(
     (state) => state.orders.isOpenAsideContainer
@@ -67,14 +70,17 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
               {!isOpenAsideContainer && (
                 <h5 className="card-title flex-grow-1 m-0">{title}</h5>
               )}
-              <div className="flex-shrink-0">
-                <span className="fw-semibold">{productsCount}</span>
-                {/* TODO(1.5): плюрализация через next-intl */}
-                <span className="text-muted">{` Продукта`}</span>
+              <div className="flex-shrink-0 text-muted">
+                {/* Плюрализация — на стороне ICU: у русского и украинского
+                    три формы, у английского две, и в разметке этого знать не
+                    нужно. */}
+                {t("productsCount", { count: productsCount })}
               </div>
               <div className="d-flex flex-column align-items-center flex-shrink-0">
                 <div className="text-muted">{formatDateShort(order.date)}</div>
-                <div className="text-muted fs-5">{formatDate(order.date)}</div>
+                <div className="text-muted fs-5">
+                  {formatDate(order.date, locale)}
+                </div>
               </div>
               {!isOpenAsideContainer && (
                 <div className="d-flex flex-column">
@@ -100,8 +106,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         <ModalWindow
           isOpen={confirmDelete.isOpen}
           onClose={confirmDelete.close}
-          /* TODO(1.5): вынести в словари next-intl */
-          title={`Удалить заказ "${title}"?`}
+          title={t("deleteTitle", { title })}
           category="order"
           id={orderId}
         />

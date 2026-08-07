@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch } from "@/lib/hooks";
 import Modal from "../modal";
 import {
@@ -30,6 +31,7 @@ export type ModalWindowProps = ModalWindowBaseProps &
 const ModalWindow: React.FC<ModalWindowProps> = (props) => {
   const { isOpen, onClose, title, category } = props;
   const dispatch = useAppDispatch();
+  const t = useTranslations();
 
   const handleDelete = () => {
     // Удаление ушло на сервер: thunk сначала дожидается `204`, и только потом
@@ -57,25 +59,23 @@ const ModalWindow: React.FC<ModalWindowProps> = (props) => {
       title={title}
       footer={
         <>
-          {/* TODO(1.5): вынести в словари next-intl */}
           <button type="button" className="btn btn-secondary" onClick={onClose}>
-            Отмена
+            {t("common.cancel")}
           </button>
           <button
             type="button"
             className="btn btn-danger"
             onClick={handleDelete}
           >
-            Удалить
+            {t("common.delete")}
           </button>
         </>
       }
     >
-      {/* TODO(1.5): вынести в словари next-intl */}
       <p className="mb-0">
         {category === "order"
-          ? "Вы уверены, что хотите удалить этот приход и все его продукты?"
-          : "Вы уверены, что хотите удалить этот продукт?"}
+          ? t("modal.confirmDeleteOrder")
+          : t("modal.confirmDeleteProduct")}
       </p>
     </Modal>
   );

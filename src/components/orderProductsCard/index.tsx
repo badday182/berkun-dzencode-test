@@ -6,6 +6,7 @@ import {
 } from "@/lib/features/orders/ordersSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 
 import styles from "./index.module.css";
 import ProductCard from "../productsCard";
@@ -14,6 +15,7 @@ import { useConfirm } from "@/hooks";
 
 const OrderProductsCard = () => {
   const confirmDelete = useConfirm();
+  const t = useTranslations("orders");
 
   const dispatch = useAppDispatch();
   const products = useAppSelector(
@@ -67,7 +69,7 @@ const OrderProductsCard = () => {
                     <ProductCard key={product.id} product={product} />
                   ))
                 ) : (
-                  <p>No products found for this order.</p>
+                  <p className="text-muted mb-0">{t("noProducts")}</p>
                 )}
               </div>
             </div>
@@ -78,7 +80,7 @@ const OrderProductsCard = () => {
         <ModalWindow
           isOpen={confirmDelete.isOpen}
           onClose={confirmDelete.close}
-          title={`Удалить заказ "${selectedOrderTitle ?? ""}"?`}
+          title={t("deleteTitle", { title: selectedOrderTitle ?? "" })}
           category="order"
           id={selectedOrderId}
         />

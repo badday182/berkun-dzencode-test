@@ -2,7 +2,8 @@
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch } from "@/lib/hooks";
 import { addOrder } from "@/lib/features/dataOrdersAndProducts/ordersAndProductsSlice";
 import { toApiError } from "@/services/api";
@@ -21,20 +22,6 @@ export interface OrderFormProps {
 const toApiDate = (localValue: string): string =>
   `${localValue.replace("T", " ")}:00`;
 
-// TODO(1.5): сообщения валидации — через t() из next-intl
-const validationSchema = Yup.object({
-  title: Yup.string()
-    .trim()
-    .min(3, "Не короче 3 символов")
-    .max(120, "Не длиннее 120 символов")
-    .required("Укажите название"),
-  date: Yup.string().required("Укажите дату"),
-  description: Yup.string()
-    .trim()
-    .max(500, "Не длиннее 500 символов")
-    .required("Добавьте описание"),
-});
-
 interface OrderFormValues {
   title: string;
   date: string;
@@ -47,9 +34,37 @@ const initialValues: OrderFormValues = {
   description: "",
 };
 
+const TITLE_MIN = 3;
+const TITLE_MAX = 120;
+const DESCRIPTION_MAX = 500;
+
 const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, onCancel }) => {
   const dispatch = useAppDispatch();
+  const t = useTranslations();
   const [serverError, setServerError] = useState<string | null>(null);
+
+  // Схема строится внутри компонента: сообщения переводятся, а `t` доступна
+  // только из хука. `useMemo` держит ссылку стабильной между рендерами —
+  // иначе Formik считал бы схему новой на каждый ввод символа.
+  const validationSchema = useMemo(
+    () =>
+      Yup.object({
+        title: Yup.string()
+          .trim()
+          .min(TITLE_MIN, t("validation.minLength", { count: TITLE_MIN }))
+          .max(TITLE_MAX, t("validation.maxLength", { count: TITLE_MAX }))
+          .required(t("validation.titleRequired")),
+        date: Yup.string().required(t("validation.dateRequired")),
+        description: Yup.string()
+          .trim()
+          .max(
+            DESCRIPTION_MAX,
+            t("validation.maxLength", { count: DESCRIPTION_MAX })
+          )
+          .required(t("validation.descriptionRequired")),
+      }),
+    [t]
+  );
 
   const handleSubmit = async (values: OrderFormValues) => {
     setServerError(null);
@@ -78,16 +93,15 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, onCancel }) => {
     >
       {({ isSubmitting, isValid, dirty }) => (
         <Form noValidate>
-          {/* TODO(1.5): подписи вынести в словари next-intl */}
           <div className="mb-3">
             <label className="form-label" htmlFor="order-title">
-              Название
+              {t("orderForm.title")}
             </label>
             <Field
               id="order-title"
               name="title"
               className="form-control"
-              placeholder="Приход от поставщика"
+              placeholder={t("orderForm.titlePlaceholder")}
             />
             <ErrorMessage
               name="title"
@@ -98,7 +112,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, onCancel }) => {
 
           <div className="mb-3">
             <label className="form-label" htmlFor="order-date">
-              Дата
+              {t("orderForm.date")}
             </label>
             <Field
               id="order-date"
@@ -115,7 +129,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, onCancel }) => {
 
           <div className="mb-3">
             <label className="form-label" htmlFor="order-description">
-              Описание
+              {t("orderForm.description")}
             </label>
             <Field
               id="order-description"
@@ -144,7 +158,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, onCancel }) => {
               onClick={onCancel}
               disabled={isSubmitting}
             >
-              Отмена
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
@@ -153,7 +167,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, onCancel }) => {
               // повторный клик по «Сохранить» тоже: запрос уже в пути.
               disabled={isSubmitting || !isValid || !dirty}
             >
-              {isSubmitting ? "Сохранение…" : "Сохранить"}
+              {isSubmitting ? t("common.saving") : t("common.save")}
             </button>
           </div>
         </Form>

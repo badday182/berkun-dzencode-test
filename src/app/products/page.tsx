@@ -2,6 +2,7 @@
 
 import ProductsCard from "@/components/productsCard";
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import SelectCustom, { type ProductTypeFilter } from "@/components/select";
 import CardPlaceholder from "@/components/cardPlaceholder";
 import AddProductButton from "@/components/forms/addProductButton";
@@ -15,6 +16,7 @@ const PLACEHOLDER_COUNT = 8;
 const TYPE_FILTER_KEY = "products:type-filter";
 
 const Products = () => {
+  const t = useTranslations();
   const { products, isLoading, error, refetch } = useProducts();
   const [selectedType, setSelectedType] = useLocalStorage<ProductTypeFilter>(
     TYPE_FILTER_KEY,
@@ -34,13 +36,15 @@ const Products = () => {
   return (
     <div className={styles.page}>
       <div className={styles.page__header}>
-        {/* TODO(1.5): вынести в словари next-intl */}
         <div>
-          <h1 className={styles.page__title}>Продукты</h1>
+          <h1 className={styles.page__title}>{t("products.title")}</h1>
           <p className={styles.page__subtitle}>
             {isLoading
-              ? "Загрузка…"
-              : `Показано ${filteredProducts.length} из ${products.length}`}
+              ? t("products.loading")
+              : t("products.shown", {
+                  shown: filteredProducts.length,
+                  total: products.length,
+                })}
           </p>
         </div>
         <AddProductButton />
@@ -51,14 +55,13 @@ const Products = () => {
           className="alert alert-danger d-flex align-items-center justify-content-between gap-3"
           role="alert"
         >
-          {/* TODO(1.5): вынести в словари next-intl */}
-          <span>Не удалось загрузить продукты: {error.message}</span>
+          <span>{t("products.loadError", { message: error.message })}</span>
           <button
             type="button"
             className="btn btn-sm btn-outline-danger flex-shrink-0"
             onClick={refetch}
           >
-            Повторить
+            {t("common.retry")}
           </button>
         </div>
       )}
@@ -84,10 +87,7 @@ const Products = () => {
               <ProductsCard key={product.id} product={product} />
             ))
           ) : (
-            // TODO(1.5): вынести в словари next-intl
-            <div className="alert alert-info mb-0">
-              Продуктов по этому фильтру нет
-            </div>
+            <div className="alert alert-info mb-0">{t("products.empty")}</div>
           )}
         </div>
       )}

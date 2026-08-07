@@ -47,11 +47,10 @@ Phase 1.2 built the API in the sibling repository `../berkun-dzencode-api`
 (NestJS, :4000) — REST for orders/products with cascade delete, a socket.io
 gateway with a session counter, domain events, CORS, `ValidationPipe`, Docker.
 
-Block 1 is complete except i18n: the app talks to the API over HTTP, holds a
-socket.io connection, loads through thunks, has `not-found` / `error` / `loading`
-routes, a collapsible sidebar and Formik forms. Still absent by design, not by
-oversight: i18n (phase 1.5 — every user-facing string carries a `TODO(1.5)`),
-editing (no `PATCH` on the API), SSR of data, auth, tests.
+Block 1 is complete: the app talks to the API over HTTP, holds a socket.io
+connection, loads through thunks, has `not-found` / `error` / `loading` routes, a
+collapsible sidebar, Formik forms and i18n in RU/EN/UK. Still absent by design,
+not by oversight: editing (no `PATCH` on the API), SSR of data, auth, tests.
 `src/types/socket.ts` is the shared event contract — the API mirrors it in
 `src/domain/events.ts`; change both or neither.
 
@@ -116,6 +115,29 @@ land in the initial bundle for someone who never opens a form.
 Conditional CSS-module classes must be written `clsx(base, cond && styles.x)`,
 not `clsx(base, { [styles.x]: cond })` — under `noUncheckedIndexedAccess` a
 module class is `string | undefined` and cannot be a computed key.
+
+### i18n (`src/i18n/`, `src/messages/`)
+
+`next-intl` with the locale in a cookie, **not** in the URL — there is no
+`[locale]` segment and no middleware, so routes stay as they are.
+`src/i18n/request.ts` reads the cookie per request and loads the dictionary;
+`src/i18n/config.ts` holds the locale list, the cookie name and `INTL_LOCALES`
+(the `Intl` tags — `uk` must become `uk-UA` or date formatting falls back to the
+browser's defaults). The switcher writes the cookie through the
+`setLocaleCookie` server action and then calls `router.refresh()`; writing
+`document.cookie` would leave the server rendering the old language.
+
+Because the layout reads a cookie, every route is server-rendered on demand —
+static prerendering is gone by design.
+
+Formatting helpers take the locale as an argument (`formatDate(date, locale)`)
+rather than reaching for a hook: they are plain functions in `utils/` and must
+stay usable from server code and tests. Yup schemas are built inside components
+via `useMemo(..., [t])` so their messages are translated and Formik still sees a
+stable schema reference.
+
+Product types are **not** translated — they are backend catalogue data, the same
+reasoning that keeps `ProductType` a string rather than an enum.
 
 `src/mocks/` is no longer wired to anything — it survives as fixtures for the
 MSW/Vitest work in phase 2.6. Do not reconnect pages to it.
@@ -195,8 +217,10 @@ declaration.
 
 ## Conventions and constraints
 
-- **UI strings and code comments are in Russian.** There is no i18n yet
-  (phase 1.5); hardcoded strings are marked `TODO(1.5)`.
+- **Code comments are in Russian; UI strings live in dictionaries.** Every
+  user-facing string goes into `src/messages/{ru,en,uk}.json` and is read with
+  `useTranslations()` (or `getTranslations()` in server components) — never
+  inline. All three files must gain the key, not just `ru.json`.
 - **`allowJs: false`** — the codebase is TypeScript-only, do not add `.js` files
   under `src/`. TS is strict plus `noUncheckedIndexedAccess`,
   `noImplicitOverride` and `noFallthroughCasesInSwitch`.
