@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import OrderDeepLink from "@/components/orderDeepLink";
+import StoreHydrator from "@/components/storeHydrator";
+import { loadOrdersAndProducts } from "@/services/serverData";
 import { toOrderId, type OrderId } from "@/types";
 
 interface OrderPageProps {
@@ -11,11 +13,9 @@ interface OrderPageProps {
  * заранее открытой боковой панелью. Существует ради двух вещей — ссылкой на
  * приход можно поделиться, и появляется настоящий повод вызвать `notFound()`.
  *
- * Страница серверная, и это важно: проверку формата она делает до того, как
- * отправит ответ, поэтому `/orders/abc` возвращает честный HTTP 404, а не 200
- * с последующим переключением на клиенте. Всё, что зависит от загруженных
- * данных, вынесено в клиентский `OrderDeepLink` — до фазы 2.1 списка на
- * сервере просто нет.
+ * С фазы 2.1 обе проверки идут на сервере: формат номера и наличие прихода в
+ * загруженном списке. Клиенту больше не нужно ждать данных, чтобы понять, что
+ * страницы не существует, — 404 приходит сразу, без промежуточного экрана.
  */
 export default async function OrderPage({ params }: OrderPageProps) {
   const { id } = await params;
@@ -23,7 +23,19 @@ export default async function OrderPage({ params }: OrderPageProps) {
 
   if (orderId === null) notFound();
 
-  return <OrderDeepLink orderId={orderId} />;
+  const { orders, products, error } = await loadOrdersAndProducts();
+
+  // Если сервер до API не достучался, судить о существовании прихода нельзя:
+  // 404 здесь означал бы «удалён», а на самом деле «неизвестно». Отдаём
+  // страницу, клиент повторит запрос и покажет ошибку с кнопкой «Повторить».
+  if (!error && !orders?.some((order) => order.id === orderId)) notFound();
+
+  return (
+    <>
+      <StoreHydrator orders={orders} products={products} />
+      <OrderDeepLink orderId={orderId} />
+    </>
+  );
 }
 
 /**

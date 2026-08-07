@@ -34,9 +34,10 @@ services:
       - "3000:3000"
     environment:
       # Браузер обращается к API с хоста, поэтому localhost, а не имя сервиса.
-      # TODO(2.1): при SSR запрос пойдёт изнутри контейнера, и туда нужен
-      # отдельный адрес `http://api:4000`.
       NEXT_PUBLIC_API_URL: http://localhost:4000
+      # А серверный рендер ходит изнутри docker-сети, где хоста нет вовсе —
+      # там API виден по имени сервиса. Обе переменные читает `apiBaseUrl()`.
+      API_URL_INTERNAL: http://api:4000
     depends_on:
       - api
     volumes:

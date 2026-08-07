@@ -159,6 +159,35 @@ export const ordersAndProductsSlice = createSlice({
   name: "ordersAndProductsData",
   initialState,
   reducers: {
+    /**
+     * Данные, пришедшие с серверного рендера (фаза 2.1).
+     *
+     * Кладёт списки и сразу помечает их загруженными — иначе клиент, увидев
+     * статус `idle`, тут же запросил бы то же самое второй раз. Оба поля
+     * необязательны: странице продуктов приходы не нужны, и хватать их «на
+     * всякий случай» незачем.
+     */
+    hydrate: (
+      state,
+      action: PayloadAction<{
+        orders?: readonly Order[];
+        products?: readonly Product[];
+      }>
+    ) => {
+      const { orders, products } = action.payload;
+
+      if (orders) {
+        state.orders = [...orders];
+        state.ordersStatus = "succeeded";
+        state.ordersError = null;
+      }
+
+      if (products) {
+        state.products = [...products];
+        state.productsStatus = "succeeded";
+        state.productsError = null;
+      }
+    },
     setOrders: (state, action: PayloadAction<Order[]>) => {
       state.orders = action.payload;
     },
@@ -255,6 +284,7 @@ const unknownError = (message: string | undefined): ApiError => ({
 });
 
 export const {
+  hydrate,
   setOrders,
   setProducts,
   deleteOrder,
